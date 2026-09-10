@@ -46,11 +46,11 @@ urlpatterns = [
     path('api/', include('emergency.urls')),
     path('api/', include('insights.urls')),
 
-    # Frontend assets. Kept outside DEBUG so the portfolio app also works
-    # when deployed with DEBUG=0 on a simple Django/Gunicorn service.
-    re_path(r'^(?P<filename>[^/]+\\.(?:css|js|png|jpg|jpeg|gif|ico|svg|webp))$', serve_frontend_file),
-    re_path(r'^(?P<filename>manifest\\.json)$', serve_frontend_file),
-    re_path(r'^(?P<filename>service-worker\\.js)$', serve_frontend_file),
+    # Frontend assets. These routes are enabled in production as well,
+    # because the project is deployed as a simple Django/Gunicorn service.
+    re_path(r'^(?P<filename>[^/]+\.(?:css|js|png|jpg|jpeg|gif|ico|svg|webp))$', serve_frontend_file),
+    re_path(r'^(?P<filename>manifest\.json)$', serve_frontend_file),
+    re_path(r'^(?P<filename>service-worker\.js)$', serve_frontend_file),
 ]
 
 if settings.DEBUG:
