@@ -1,0 +1,42 @@
+version: "3.1"
+rules:
+- rule: greet
+  steps:
+  - intent: greet
+  - action: utter_greet
+- rule: redness
+  steps:
+  - intent: eye_redness
+  - action: utter_eye_redness
+- rule: pain
+  steps:
+  - intent: eye_pain
+  - action: utter_eye_pain
+- rule: blurry vision
+  steps:
+  - intent: blurred_vision
+  - action: utter_blurred_vision
+- rule: dry eyes
+  steps:
+  - intent: dry_eyes
+  - action: utter_dry_eyes
+- rule: itchy eyes
+  steps:
+  - intent: itchy_eyes
+  - action: utter_itchy_eyes
+- rule: result
+  steps:
+  - intent: eye_screening_result
+  - action: utter_eye_screening_result
+- rule: emergency
+  steps:
+  - intent: emergency_eye
+  - action: utter_emergency_eye
+- rule: prevention
+  steps:
+  - intent: prevention
+  - action: utter_prevention
+- rule: goodbye
+  steps:
+  - intent: goodbye
+  - action: utter_goodbye
