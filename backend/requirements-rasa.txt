@@ -1,0 +1,2 @@
+# Optional conversational NLP layer for the eye-health module.
+rasa>=3.6,<4
