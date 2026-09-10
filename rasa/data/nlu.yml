@@ -1,0 +1,71 @@
+version: "3.1"
+nlu:
+- intent: greet
+  examples: |
+    - hi
+    - hello
+    - hey
+    - hi there
+    - good morning
+- intent: eye_redness
+  examples: |
+    - my eye is red
+    - eyes are red
+    - eye is looking reddish
+    - my eyes are bloodshot
+    - eye redness
+    - aankh laal hai
+    - meri aankh red hai
+- intent: eye_pain
+  examples: |
+    - my eye hurts
+    - eye pain
+    - my eyes are hurting
+    - aankh mein dard hai
+    - meri aankh dukh rahi hai
+- intent: blurred_vision
+  examples: |
+    - my vision is blurry
+    - blurry eyesight
+    - things look blurry
+    - I cannot see clearly
+    - nazar dhundhli hai
+- intent: dry_eyes
+  examples: |
+    - my eyes feel dry
+    - dry eyes
+    - eyes are gritty
+    - burning dry eyes
+    - aankhon mein dryness hai
+- intent: itchy_eyes
+  examples: |
+    - my eyes are itchy
+    - itchy eyes
+    - eyes keep itching
+    - aankhon mein khujli hai
+- intent: eye_screening_result
+  examples: |
+    - explain my eye result
+    - what does my eye report mean
+    - explain the scan
+    - what did the eye scan find
+    - explain my screening result
+- intent: emergency_eye
+  examples: |
+    - sudden loss of vision
+    - I suddenly cannot see
+    - severe eye pain and blurry vision
+    - curtain over my vision
+    - eye injury with vision loss
+    - sudden flashes and many new floaters
+- intent: prevention
+  examples: |
+    - how can I protect my eyes
+    - eye care tips
+    - how to keep eyes healthy
+    - how do I prevent eye problems
+- intent: goodbye
+  examples: |
+    - bye
+    - goodbye
+    - thanks bye
