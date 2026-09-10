@@ -7,14 +7,13 @@ from django.views.generic import TemplateView
 from django.conf import settings
 from django.conf.urls.static import static
 from django.views.static import serve
-import os
 
 # Frontend directory path
 FRONTEND_DIR = settings.BASE_DIR.parent / 'frontend'
 
 
 def serve_frontend_file(request, filename):
-    """Serve static files from frontend directory."""
+    """Serve frontend CSS, JS and image assets."""
     return serve(request, filename, document_root=FRONTEND_DIR)
 
 
@@ -37,32 +36,22 @@ urlpatterns = [
     path('admin-login.html', TemplateView.as_view(template_name='admin-login.html'), name='admin-login'),
     path('admin.html', TemplateView.as_view(template_name='admin.html'), name='admin'),
     path('eye-health.html', TemplateView.as_view(template_name='eye-health.html'), name='eye-health'),
-    
+
     # Admin panel
     path('admin/', admin.site.urls),
-    
+
     # API endpoints
     path('api/', include('api.urls')),
     path('api/', include('health.urls')),
     path('api/', include('emergency.urls')),
     path('api/', include('insights.urls')),
+
+    # Frontend assets. Kept outside DEBUG so the portfolio app also works
+    # when deployed with DEBUG=0 on a simple Django/Gunicorn service.
+    re_path(r'^(?P<filename>[^/]+\\.(?:css|js|png|jpg|jpeg|gif|ico|svg|webp))$', serve_frontend_file),
+    re_path(r'^(?P<filename>manifest\\.json)$', serve_frontend_file),
+    re_path(r'^(?P<filename>service-worker\\.js)$', serve_frontend_file),
 ]
 
-# Serve static files (CSS, JS, images) from frontend directory in development
 if settings.DEBUG:
-    urlpatterns += [
-        # Serve specific static file types from frontend directory
-        re_path(r'^(?P<filename>.+\.css)$', serve_frontend_file),
-        re_path(r'^(?P<filename>.+\.js)$', serve_frontend_file),
-        re_path(r'^(?P<filename>.+\.png)$', serve_frontend_file),
-        re_path(r'^(?P<filename>.+\.jpg)$', serve_frontend_file),
-        re_path(r'^(?P<filename>.+\.jpeg)$', serve_frontend_file),
-        re_path(r'^(?P<filename>.+\.gif)$', serve_frontend_file),
-        re_path(r'^(?P<filename>.+\.ico)$', serve_frontend_file),
-        re_path(r'^(?P<filename>.+\.svg)$', serve_frontend_file),
-        re_path(r'^(?P<filename>.+\.webp)$', serve_frontend_file),
-        re_path(r'^(?P<filename>manifest\.json)$', serve_frontend_file),
-        re_path(r'^(?P<filename>service-worker\.js)$', serve_frontend_file),
-    ]
-    # Serve media files
     urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
