@@ -1,0 +1,298 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Check MyCure</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link rel="manifest" href="manifest.json">
+</head>
+
+<body>
+    <header class="site-header">
+        <div class="header-left">
+            <div class="logo-row">
+                <img src="logo.png" alt="Logo" class="logo" onclick="window.location.href='index.html'" style="cursor: pointer;">
+                <h1 class="logo-text" onclick="window.location.href='index.html'" style="cursor: pointer;">Check My Cure</h1>
+            </div>
+
+            <nav class="main-nav">
+                <ul class="nav-links">
+                    <li><a href="index.html">Home</a></li>
+                    <li><a href="about.html">About Us</a></li>
+                    <li><a href="contact.html">Contact</a></li>
+                </ul>
+            </nav>
+        </div>
+
+        <div class="header-center">
+            <div class="section-nav">
+                <button onclick="window.location.href='index.html'">Onboarding</button>
+                <button onclick="window.location.href='symptom-checker.html'">Symptoms</button>
+                <button onclick="window.location.href='chatbot.html'">Chatbot</button>
+                <button onclick="window.location.href='nearby-clinics.html'">Find NearBy Clinics</button>
+            </div>
+        </div>
+
+        <div class="header-right">
+            <span id="welcomeMessage" class="welcome-message"></span>
+
+            <div class="profile-menu">
+                <button class="profile-icon" id="profileBtn">
+                    <i class="fas fa-user-circle"></i>
+                </button>
+
+                <div class="profile-dropdown" id="profileDropdown">
+                    <a href="profile.html">Profile</a>
+                    <a href="dashboard.html">Dashboard</a>
+                    <a href="settings.html">Settings</a>
+                    <a href="#" id="logoutLink">Logout</a>
+                </div>
+            </div>
+        </div>
+        <div id="google_translate_element"></div>
+
+        <script type="text/javascript">
+            function googleTranslateElementInit() {
+                new google.translate.TranslateElement(
+                    {
+                        pageLanguage: 'en',
+                        layout: google.translate.TranslateElement.InlineLayout.SIMPLE
+                    },
+                    'google_translate_element'
+                );
+            }
+        </script>
+
+        <script src="//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit">
+        </script>
+
+    </header>
+    <main>
+        <section id="symptoms" class="section active">
+            <h2 class="page-title">Select symptoms</h2>
+
+            <div class="stepper" id="stepper">
+                <div class="step active" data-step="1">1<br><span>Symptoms</span></div>
+                <div class="step" data-step="2">2<br><span>History</span></div>
+                <div class="step" data-step="3">3<br><span>Results</span></div>
+            </div>
+
+            <div class="step-content" data-step="1">
+                <label class="dropdown-label">Select symptom category</label>
+                <select id="categorySelect" class="symptom-select">
+                    <option value="">-- Select Category --</option>
+                    <option value="general">General</option>
+                    <option value="respiratory">Respiratory</option>
+                    <option value="ent">ENT</option>
+                    <option value="gastro">Gastrointestinal</option>
+                    <option value="neuro">Neurological</option>
+                    <option value="musculo">Musculoskeletal</option>
+                    <option value="cardio">Cardiovascular</option>
+                    <option value="urinary">Urinary</option>
+                </select>
+
+                <label class="dropdown-label">Select symptoms</label>
+                <select id="symptomSelect" class="symptom-select" multiple disabled>
+                </select>
+
+                <div id="selectedSymptomsPreview" class="selected-preview"></div>
+
+                <button class="primary wide" onclick="nextStep()">Next</button>
+
+            </div>
+
+            <div class="step-content" data-step="2" style="display:none;">
+                <h3>Provide information</h3>
+                <label>Age<input id="age" type="number"></label>
+                <label>Gender
+                    <div class="gender-radio-group" style="display: flex; gap: 1rem; margin-top: 0.5rem;">
+                        <label style="display: flex; align-items: center; gap: 0.3rem; cursor: pointer;">
+                            <input type="radio" name="gender" value="male" id="genderMale" style="cursor: pointer;">
+                            Male
+                        </label>
+                        <label style="display: flex; align-items: center; gap: 0.3rem; cursor: pointer;">
+                            <input type="radio" name="gender" value="female" id="genderFemale" style="cursor: pointer;">
+                            Female
+                        </label>
+                        <label style="display: flex; align-items: center; gap: 0.3rem; cursor: pointer;">
+                            <input type="radio" name="gender" value="others" id="genderOthers" style="cursor: pointer;">
+                            Others
+                        </label>
+                    </div>
+                </label>
+                <label>Relevant medical history
+                    <textarea id="history"></textarea>
+                </label>
+                <button class="primary wide" onclick="nextStep()">Next</button>
+            </div>
+
+            <div class="step-content" data-step="3" style="display:none;">
+                <h3>Review</h3>
+                <div id="review"></div>
+                <button class="primary wide" onclick="predictIllness()">Get Results</button>
+            </div>
+            <section id="results" class="section">
+                <h2>Results</h2>
+                <div id="prediction"></div>
+                <div id="suggestions"></div>
+
+                <div class="results-actions">
+                    <button onclick="window.location.href='nearby-clinics.html'">
+                        Find Nearby Clinics
+                    </button>
+                    <button onclick="window.location.href='chatbot.html'">
+                        Open Chatbot
+                    </button>
+                </div>
+            </section>
+
+        </section>
+    </main>
+
+    <!-- Floating Read Aloud -->
+    <div class="read-aloud-container">
+        <button id="readAloudToggle" class="read-aloud-btn">
+            <i class="fas fa-volume-up"></i>
+        </button>
+
+        <div id="readAloudPanel" class="read-aloud-panel">
+            <button onclick="readWholePage()">📄 Read Whole Page</button>
+            <button onclick="readSelectedText()">✂ Read Selected Text</button>
+
+            <label>
+                Speed:
+                <input type="range" id="speechSpeed" min="0.5" max="1.5" step="0.1" value="1">
+                <span id="speedValue">1x</span>
+            </label>
+
+            <button class="stop-btn" onclick="stopReading()">⏹ Stop</button>
+        </div>
+    </div>
+
+    <button class="emergency-fab" onclick="triggerEmergency()" aria-label="Emergency SOS">🚨</button>
+
+    <footer class="site-footer">
+        <div class="footer-container">
+
+            <div class="footer-brand">
+                <img src="logo.png" alt="Check MyCure logo">
+                <p>
+                    Empowering health through AI technology.
+                    Get instant disease predictions and emergency assistance anytime, anywhere.
+                </p>
+            </div>
+
+            <div class="footer-links">
+                <h4>Quick Links</h4>
+                <a href="index.html">Home</a>
+                <a href="about.html">About</a>
+                <a href="contact.html">Contact</a>
+            </div>
+
+            <div class="footer-social">
+                <h4>Follow Us</h4>
+                <div class="social-icons">
+                    <a href="#"><i class="fab fa-facebook-f"></i></a>
+                    <a href="#"><i class="fab fa-twitter"></i></a>
+                    <a href="#"><i class="fab fa-instagram"></i></a>
+                    <a href="#"><i class="fab fa-linkedin-in"></i></a>
+                </div>
+            </div>
+
+        </div>
+
+        <div class="footer-bottom">
+            © 2026 Check MyCure. All rights reserved.
+            <a href="#">Medical Disclaimer</a>
+        </div>
+    </footer>
+
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script src="app.js"></script>
+    
+    <script>
+    // Symptom dropdown initialization - runs after app.js loads
+    (function() {
+        const symptomData = {
+            general: ["Fever", "Fatigue", "Weight loss", "Loss of appetite", "Chills", "Weakness", "Body aches", "Sweating", "Dehydration", "Malaise"],
+            respiratory: ["Cough", "Shortness of breath", "Chest tightness", "Wheezing", "Sore throat", "Dry cough", "Productive cough", "Chest pain while breathing", "Rapid breathing", "Hoarseness"],
+            ent: ["Runny nose", "Nasal congestion", "Ear pain", "Hearing loss", "Sinus pressure", "Sneezing", "Ear discharge", "Loss of smell", "Loss of taste", "Throat irritation", "Swollen tonsils"],
+            gastro: ["Nausea", "Vomiting", "Diarrhea", "Abdominal pain", "Heartburn", "Constipation", "Stomach cramps", "Bloating", "Acid reflux", "Blood in stool", "Dark stools"],
+            neuro: ["Headache", "Dizziness", "Seizures", "Numbness", "Memory issues", "Lightheadedness", "Confusion", "Difficulty concentrating", "Fainting", "Tingling sensation", "Sensitivity to light"],
+            musculo: ["Joint pain", "Muscle pain", "Back pain", "Stiffness", "Swelling", "Muscle stiffness", "Swollen joints", "Reduced mobility", "Neck stiffness", "Muscle cramps", "Limb weakness"],
+            cardio: ["Chest pain", "Palpitations", "Shortness of breath", "Dizziness", "Swelling in legs", "Rapid heartbeat", "Slow heartbeat", "Irregular heartbeat", "Chest pressure", "Cold extremities"],
+            urinary: ["Painful urination", "Frequent urination", "Blood in urine", "Lower abdominal pain", "Reduced urine output", "Dark urine", "Foul smelling urine", "Urinary urgency", "Difficulty urinating", "Flank pain"]
+        };
+
+        function initDropdowns() {
+            const categorySelect = document.getElementById("categorySelect");
+            const symptomSelect = document.getElementById("symptomSelect");
+            const preview = document.getElementById("selectedSymptomsPreview");
+
+            if (!categorySelect || !symptomSelect) {
+                console.error("Dropdown elements not found");
+                return;
+            }
+
+            console.log("Initializing symptom dropdowns...");
+
+            categorySelect.addEventListener("change", function() {
+                const category = this.value;
+                console.log("Category selected:", category);
+
+                // Clear previous options
+                symptomSelect.innerHTML = "";
+                if (typeof selectedSymptoms !== 'undefined') selectedSymptoms = [];
+                if (preview) preview.innerHTML = "";
+
+                if (!category) {
+                    symptomSelect.disabled = true;
+                    return;
+                }
+
+                symptomSelect.disabled = false;
+
+                // Get symptoms for selected category
+                const symptoms = symptomData[category];
+                if (symptoms && symptoms.length > 0) {
+                    symptoms.forEach(function(symptom) {
+                        const option = document.createElement("option");
+                        option.value = symptom.toLowerCase().replace(/\s+/g, "_");
+                        option.textContent = symptom;
+                        symptomSelect.appendChild(option);
+                    });
+                    console.log("Added", symptoms.length, "symptoms for category:", category);
+                } else {
+                    console.error("No symptoms found for category:", category);
+                }
+            });
+
+            symptomSelect.addEventListener("change", function() {
+                const selected = Array.from(this.selectedOptions).map(opt => opt.textContent);
+                if (typeof selectedSymptoms !== 'undefined') {
+                    selectedSymptoms = selected;
+                }
+                if (preview) {
+                    preview.innerHTML = selected.length ? "Selected: " + selected.join(", ") : "";
+                }
+            });
+
+            console.log("Symptom dropdowns ready!");
+        }
+
+        // Initialize when DOM is ready
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', initDropdowns);
+        } else {
+            initDropdowns();
+        }
+    })();
+    </script>
+
+</body>
+
+</html>

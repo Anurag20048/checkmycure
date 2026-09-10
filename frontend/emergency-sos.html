@@ -1,0 +1,781 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Emergency SOS - Check MyCure</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #ff4757 0%, #ff6348 100%);
+            height: 100vh;
+            width: 100vw;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: fixed;
+        }
+
+        .emergency-container {
+            display: block;
+            background: #ffffff;
+            padding: 2rem;
+            border-radius: 20px;
+            width: min(90%, 600px);
+            max-height: 90vh;
+            overflow-y: auto;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.25);
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        .header h1 {
+            color: #ff4757;
+            font-size: 2rem;
+            margin-bottom: 0.5rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+        }
+
+        .header p {
+            color: #666;
+            font-size: 0.9rem;
+        }
+
+        /* SOS Button - Large and High Contrast */
+        .sos-button {
+            width: 200px;
+            height: 200px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #ff4757 0%, #ff6b81 100%);
+            border: 8px solid #fff;
+            box-shadow: 0 10px 40px rgba(255, 71, 87, 0.6);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            margin: 2rem auto;
+            cursor: pointer;
+            transition: all 0.3s;
+            animation: pulse 2s infinite;
+        }
+
+        .sos-button:hover {
+            transform: scale(1.05);
+            box-shadow: 0 15px 50px rgba(255, 71, 87, 0.8);
+        }
+
+        .sos-button:active {
+            transform: scale(0.95);
+        }
+
+        @keyframes pulse {
+            0%, 100% {
+                box-shadow: 0 10px 40px rgba(255, 71, 87, 0.6);
+            }
+            50% {
+                box-shadow: 0 10px 60px rgba(255, 71, 87, 1);
+            }
+        }
+
+        .sos-button .icon {
+            font-size: 4rem;
+            color: white;
+            margin-bottom: 0.5rem;
+        }
+
+        .sos-button .text {
+            color: white;
+            font-size: 1.5rem;
+            font-weight: bold;
+        }
+
+        .info-section {
+            background: #f8f9fa;
+            padding: 1.5rem;
+            border-radius: 12px;
+            margin-bottom: 1.5rem;
+        }
+
+        .info-section h3 {
+            color: #2c3e50;
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .info-item {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            padding: 0.75rem;
+            background: white;
+            border-radius: 8px;
+            margin-bottom: 0.5rem;
+        }
+
+        .info-item i {
+            color: #667eea;
+            font-size: 1.2rem;
+            width: 25px;
+        }
+
+        .back-button {
+            display: block;
+            width: 100%;
+            padding: 1rem;
+            background: #ecf0f1;
+            color: #2c3e50;
+            text-align: center;
+            border-radius: 12px;
+            text-decoration: none;
+            font-weight: 600;
+            transition: background 0.3s;
+        }
+
+        .back-button:hover {
+            background: #d5dbdb;
+        }
+
+        /* Emergency Active State */
+        .emergency-active {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background: linear-gradient(135deg, #ff4757 0%, #ff6348 100%);
+            z-index: 10000;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+        }
+
+        .emergency-active.active {
+            display: flex;
+        }
+
+        .emergency-content {
+            background: white;
+            padding: 2rem;
+            border-radius: 20px;
+            max-width: 500px;
+            max-height: 85vh;
+            width: 90%;
+            text-align: center;
+            overflow-y: auto;
+        }
+
+        .emergency-content h2 {
+            color: #ff4757;
+            font-size: 2rem;
+            margin-bottom: 1rem;
+        }
+
+        .status-list {
+            text-align: left;
+            margin: 1.5rem 0;
+            max-height: 40vh;
+            overflow-y: auto;
+        }
+
+        .status-item {
+            padding: 0.75rem;
+            background: #f8f9fa;
+            border-radius: 8px;
+            margin-bottom: 0.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .status-item.success {
+            border-left: 4px solid #27ae60;
+        }
+
+        .status-item.loading {
+            border-left: 4px solid #f39c12;
+        }
+
+        .status-item.error {
+            border-left: 4px solid #e74c3c;
+        }
+
+        .cancel-button {
+            width: 100%;
+            padding: 1rem;
+            background: #e74c3c;
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-size: 1.1rem;
+            font-weight: bold;
+            cursor: pointer;
+            margin-top: 1rem;
+        }
+
+        .cancel-button:hover {
+            background: #c0392b;
+        }
+
+        .location-map {
+            width: 100%;
+            height: 200px;
+            border-radius: 12px;
+            background: #ecf0f1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 1rem 0;
+            color: #7f8c8d;
+        }
+
+        @media (max-width: 768px) {
+            .sos-button {
+                width: 180px;
+                height: 180px;
+            }
+
+            .sos-button .icon {
+                font-size: 3.5rem;
+            }
+
+            .sos-button .text {
+                font-size: 1.3rem;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="emergency-container">
+        <div class="header">
+            <h1><i class="fas fa-ambulance"></i> Emergency SOS</h1>
+            <p>One-tap emergency assistance</p>
+        </div>
+
+        <!-- One-Tap SOS Button -->
+        <div class="sos-button" id="sosButton" onclick="activateEmergency()">
+            <div class="icon">🚨</div>
+            <div class="text">SOS</div>
+        </div>
+
+        <!-- Emergency Features Info -->
+        <div class="info-section">
+            <h3><i class="fas fa-info-circle"></i> What happens when you press SOS?</h3>
+            
+            <div class="info-item">
+                <i class="fas fa-phone"></i>
+                <div>
+                    <strong>Automatic Calling</strong><br>
+                    <small>Opens your phone dialer for configured contacts</small>
+                </div>
+            </div>
+
+            <div class="info-item">
+                <i class="fas fa-map-marker-alt"></i>
+                <div>
+                    <strong>Live Location Sharing</strong><br>
+                    <small>Gets your location and records it with the SOS request</small>
+                </div>
+            </div>
+
+            <div class="info-item">
+                <i class="fas fa-comment-medical"></i>
+                <div>
+                    <strong>Emergency Alert</strong><br>
+                    <small>Prepares SMS/WhatsApp alerts for you to send</small>
+                </div>
+            </div>
+
+            <div class="info-item">
+                <i class="fas fa-heartbeat"></i>
+                <div>
+                    <strong>Medical Profile Shared</strong><br>
+                    <small>Blood group, allergies, medications</small>
+                </div>
+            </div>
+        </div>
+
+        <a href="index.html" class="back-button">
+            <i class="fas fa-arrow-left"></i> Back to Home
+        </a>
+    </div>
+
+    <!-- Emergency Active Screen -->
+    <div class="emergency-active" id="emergencyActive">
+        <div class="emergency-content">
+            <h2>🚨 EMERGENCY ACTIVATED</h2>
+            <p style="color: #666; margin-bottom: 1rem;">Emergency mode is active. Choose the action you need.</p>
+
+            <div class="location-map" id="locationMap">
+                <i class="fas fa-map-marked-alt" style="font-size: 3rem;"></i>
+            </div>
+
+            <div class="status-list" id="statusList">
+                <!-- Dynamic status items -->
+            </div>
+
+            <button class="cancel-button" onclick="cancelEmergency()">
+                ❌ CANCEL EMERGENCY
+            </button>
+        </div>
+    </div>
+
+    <script>
+        let emergencyActive = false;
+        let locationWatcher = null;
+        let currentLocation = null;
+        let callAttempts = [];
+
+        // Emergency data helpers
+        function loadEmergencyProfile() {
+            return JSON.parse(localStorage.getItem('emergencyProfile')) || {
+                name: 'User', age: '', gender: '', blood: 'Unknown', allergies: 'None',
+                conditions: 'None', meds: 'None', phone: '', phone2: '',
+                contact_name: 'Primary contact', contact2_relation: 'Secondary contact'
+            };
+        }
+
+        function loadEmergencyContacts() {
+            return JSON.parse(localStorage.getItem('emergencyContacts')) || [];
+        }
+
+        function authHeaders() {
+            const token = localStorage.getItem('authToken');
+            return token ? {'Authorization': `Token ${token}`} : {};
+        }
+
+        async function loadEmergencyData() {
+            let profile = loadEmergencyProfile();
+            let contacts = loadEmergencyContacts();
+            const token = localStorage.getItem('authToken');
+
+            if (token) {
+                try {
+                    const response = await fetch('/api/medical-profile/', {headers: authHeaders()});
+                    if (response.ok) {
+                        const server = await response.json();
+                        profile = {
+                            ...profile,
+                            name: server.name || profile.name,
+                            age: server.age ?? profile.age,
+                            gender: server.gender || profile.gender,
+                            blood: server.blood_group || profile.blood,
+                            height: server.height ?? profile.height,
+                            weight: server.weight ?? profile.weight,
+                            allergies: server.allergies || profile.allergies,
+                            conditions: server.conditions || profile.conditions,
+                            meds: server.medications || profile.meds,
+                            surgeries: server.previous_surgeries || profile.surgeries,
+                            insurance: server.insurance_info || profile.insurance,
+                            doctor: server.primary_doctor || profile.doctor,
+                            special_needs: server.special_needs || profile.special_needs,
+                            phone: server.emergency_contact_phone || profile.phone,
+                            contact_name: server.emergency_contact_name || profile.contact_name,
+                            phone2: server.secondary_contact_phone || profile.phone2,
+                            contact2_relation: server.secondary_contact_relation || profile.contact2_relation
+                        };
+                        localStorage.setItem('emergencyProfile', JSON.stringify(profile));
+                    }
+                } catch (error) {
+                    console.warn('Could not load medical profile from server:', error);
+                }
+
+                try {
+                    const response = await fetch('/api/emergency-contacts/', {headers: authHeaders()});
+                    if (response.ok) {
+                        contacts = await response.json();
+                        localStorage.setItem('emergencyContacts', JSON.stringify(contacts));
+                    }
+                } catch (error) {
+                    console.warn('Could not load emergency contacts from server:', error);
+                }
+            }
+            return {profile, contacts};
+        }
+
+        async function getNearbyHospitals() {
+            if (!currentLocation) return [];
+            try {
+                const url = `/api/locations/nearby/?lat=${encodeURIComponent(currentLocation.lat)}&lng=${encodeURIComponent(currentLocation.lng)}&radius=5000`;
+                const response = await fetch(url);
+                if (!response.ok) throw new Error('Nearby hospital lookup failed');
+                const data = await response.json();
+                return (data.results || []).filter(place => {
+                    const type = String(place.type || '').toLowerCase();
+                    return type === 'hospital' || type === 'clinic' || type === 'doctors';
+                }).slice(0, 8);
+            } catch (error) {
+                console.warn(error);
+                addStatus('⚠️ Nearby hospital service is unavailable right now.', 'error');
+                return [];
+            }
+        }
+
+        function buildEmergencyMessage(profile) {
+            const locationLink = currentLocation
+                ? `https://maps.google.com/?q=${currentLocation.lat},${currentLocation.lng}`
+                : 'Location unavailable';
+            return [
+                '🚨 CHECK MYCURE EMERGENCY ALERT 🚨',
+                '',
+                `Name: ${profile.name || 'User'}`,
+                `Age: ${profile.age || 'Unknown'}`,
+                `Gender: ${profile.gender || 'Unknown'}`,
+                `Blood Group: ${profile.blood || 'Unknown'}`,
+                `Allergies: ${profile.allergies || 'None'}`,
+                `Conditions: ${profile.conditions || 'None'}`,
+                `Medications: ${profile.meds || 'None'}`,
+                `Previous Surgeries: ${profile.surgeries || 'None'}`,
+                `Special Needs: ${profile.special_needs || 'None'}`,
+                '',
+                `Location: ${locationLink}`,
+                '',
+                'Immediate medical assistance may be required.',
+                'Sent from Check MyCure.'
+            ].join('\n');
+        }
+
+        function updateLocationMap() {
+            const map = document.getElementById('locationMap');
+            if (!map || !currentLocation) return;
+            const url = `https://www.openstreetmap.org/?mlat=${currentLocation.lat}&mlon=${currentLocation.lng}#map=16/${currentLocation.lat}/${currentLocation.lng}`;
+            map.innerHTML = `<a href="${url}" target="_blank" rel="noopener" style="color:#546e7a;text-decoration:none;text-align:center;">📍<br><strong>Location found</strong><br><small>Open live location map</small></a>`;
+        }
+
+        function startLocationTracking() {
+            if (!navigator.geolocation || locationWatcher !== null) return;
+            locationWatcher = navigator.geolocation.watchPosition(position => {
+                currentLocation = {
+                    lat: position.coords.latitude,
+                    lng: position.coords.longitude,
+                    accuracy: position.coords.accuracy
+                };
+                localStorage.setItem('lastKnownLocation', JSON.stringify(currentLocation));
+                updateLocationMap();
+            }, () => {}, {enableHighAccuracy: true, maximumAge: 30000, timeout: 15000});
+        }
+
+        function getLocationAndShare() {
+            return new Promise(resolve => {
+                addStatus('📍 Getting your location...', 'loading');
+                if (!navigator.geolocation) {
+                    addStatus('❌ GPS is not supported. Call buttons are still available.', 'error');
+                    resolve(); return;
+                }
+                navigator.geolocation.getCurrentPosition(
+                    position => {
+                        currentLocation = {
+                            lat: position.coords.latitude,
+                            lng: position.coords.longitude,
+                            accuracy: position.coords.accuracy
+                        };
+                        localStorage.setItem('lastKnownLocation', JSON.stringify(currentLocation));
+                        addStatus('✅ Current location found', 'success');
+                        updateLocationMap();
+                        startLocationTracking();
+                        resolve();
+                    },
+                    () => {
+                        const lastLocation = JSON.parse(localStorage.getItem('lastKnownLocation') || 'null');
+                        if (lastLocation) {
+                            currentLocation = lastLocation;
+                            addStatus('⚠️ Live GPS unavailable. Using last known location.', 'loading');
+                            updateLocationMap();
+                        } else {
+                            addStatus('⚠️ Location unavailable. Emergency calls remain available.', 'error');
+                        }
+                        resolve();
+                    },
+                    {enableHighAccuracy: true, timeout: 12000, maximumAge: 30000}
+                );
+            });
+        }
+
+        async function activateEmergency() {
+            if (emergencyActive) return;
+            emergencyActive = true;
+            document.getElementById('emergencyActive').classList.add('active');
+            addStatus('🚨 Emergency mode activated', 'success');
+            if (navigator.vibrate) navigator.vibrate([200, 100, 200]);
+
+            const {profile, contacts} = await loadEmergencyData();
+            await getLocationAndShare();
+            const hospitals = await getNearbyHospitals();
+            const sosData = await logEmergencyToServer();
+
+            renderEmergencySummary(profile, contacts, hospitals);
+            renderEmergencyActions(profile, contacts, hospitals, sosData);
+            shareMedicalProfile(profile);
+            if (sosData && sosData.message && hospitals.length) {
+                await notifyNearbyHospitals(sosData.message, hospitals);
+            }
+        }
+
+        function renderEmergencySummary(profile, contacts, hospitals) {
+            const statusDiv = document.getElementById('statusList');
+            const old = document.getElementById('emergencySummary');
+            if (old) old.remove();
+
+            const box = document.createElement('div');
+            box.id = 'emergencySummary';
+            box.style.cssText = 'margin-top:1rem;padding:1rem;background:#f8f9fa;border:1px solid #e2e8f0;border-radius:12px;text-align:left;';
+
+            const contactRows = [];
+            if (profile.phone) contactRows.push({name: profile.contact_name || 'Primary contact', phone: profile.phone, relation: 'Primary'});
+            if (profile.phone2) contactRows.push({name: profile.contact2_relation ? `${profile.contact2_relation} contact` : 'Secondary contact', phone: profile.phone2, relation: 'Secondary'});
+            contacts.forEach(c => contactRows.push({name: c.name, phone: c.phone, relation: c.relationship || 'Emergency contact'}));
+
+            box.innerHTML = `
+                <h4 style="margin:0 0 .7rem;color:#263238;">🩺 Medical Profile</h4>
+                <div style="padding:.7rem;background:#fff8e1;border-radius:8px;margin-bottom:1rem;line-height:1.65;">
+                    <strong>${escapeHtml(profile.name || 'Not set')}</strong><br>
+                    Age: ${escapeHtml(profile.age || 'Not set')} · Gender: ${escapeHtml(profile.gender || 'Not set')}<br>
+                    Blood Group: ${escapeHtml(profile.blood || 'Unknown')}<br>
+                    Allergies: ${escapeHtml(profile.allergies || 'None')}<br>
+                    Conditions: ${escapeHtml(profile.conditions || 'None')}<br>
+                    Medications: ${escapeHtml(profile.meds || 'None')}<br>
+                    Previous Surgeries: ${escapeHtml(profile.surgeries || 'None')}<br>
+                    Special Needs: ${escapeHtml(profile.special_needs || 'None')}
+                </div>
+                <h4 style="margin:0 0 .7rem;color:#263238;">👥 Emergency Contacts</h4>
+                ${contactRows.length ? contactRows.map(c => `<div style="padding:.55rem .65rem;background:white;border-radius:8px;margin:.35rem 0;"><strong>${escapeHtml(c.name)}</strong> <span style="color:#777">(${escapeHtml(c.relation)})</span><br><a href="tel:${escapeAttr(c.phone)}" style="color:#1976d2;font-weight:600;">📞 ${escapeHtml(c.phone)}</a></div>`).join('') : '<p style="color:#c62828;">No emergency contact is configured. Add one in Emergency Profile.</p>'}
+                <h4 style="margin:1rem 0 .7rem;color:#263238;">🏥 Nearby Medical Facilities</h4>
+                ${hospitals.length ? hospitals.map(h => `<div style="padding:.55rem .65rem;background:white;border-radius:8px;margin:.35rem 0;"><strong>${escapeHtml(h.name)}</strong><br><span style="color:#666;">${escapeHtml(h.type || 'healthcare')}</span>${h.phone ? `<br><a href="tel:${escapeAttr(h.phone)}" style="color:#1976d2;font-weight:600;">📞 ${escapeHtml(h.phone)}</a>` : '<br><small style="color:#999;">No public phone number listed</small>'}</div>`).join('') : '<p style="color:#777;">No nearby facility was returned by the map service.</p>'}
+            `;
+            statusDiv.appendChild(box);
+        }
+
+        function escapeHtml(value) {
+            return String(value ?? '').replace(/[&<>'"]/g, char => ({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[char]));
+        }
+
+        function escapeAttr(value) { return encodeURIComponent(String(value ?? '')); }
+
+        function renderEmergencyActions(profile, contacts, hospitals, sosData) {
+            const statusDiv = document.getElementById('statusList');
+            const old = document.getElementById('emergencyActions');
+            if (old) old.remove();
+
+            const allContacts = [];
+            if (profile.phone) allContacts.push({name: profile.contact_name || 'Primary contact', phone: profile.phone});
+            if (profile.phone2) allContacts.push({name: 'Secondary contact', phone: profile.phone2});
+            contacts.forEach(c => allContacts.push({name: c.name, phone: c.phone}));
+
+            const box = document.createElement('div');
+            box.id = 'emergencyActions';
+            box.style.cssText = 'margin-top:1rem;padding:1rem;background:#fff;border:1px solid #f0caca;border-radius:12px;text-align:left;';
+            box.innerHTML = '<h4 style="margin:0 0 .5rem">🚑 Emergency Actions</h4><p style="font-size:.85rem;color:#666;margin-bottom:.7rem">Automatic messaging requires a configured SMS/WhatsApp provider. Phone/WhatsApp buttons remain available as a fallback.</p>';
+
+            const call112 = document.createElement('button');
+            call112.textContent = '📞 Call 112 Emergency Services';
+            call112.style.cssText = 'width:100%;padding:.85rem;background:#d32f2f;color:white;border:0;border-radius:8px;font-weight:bold;cursor:pointer;margin:.35rem 0;';
+            call112.onclick = () => { window.location.href = 'tel:112'; };
+            box.appendChild(call112);
+
+            allContacts.forEach(contact => {
+                const row = document.createElement('div');
+                row.style.cssText = 'display:flex;gap:.5rem;margin:.35rem 0;align-items:center;';
+                const call = document.createElement('button');
+                call.textContent = `📞 Call ${contact.name}`;
+                call.style.cssText = 'flex:1;padding:.7rem;background:#1976d2;color:white;border:0;border-radius:8px;cursor:pointer;';
+                call.onclick = () => { window.location.href = `tel:${contact.phone}`; };
+                const wa = document.createElement('button');
+                wa.textContent = '💬 WhatsApp';
+                wa.style.cssText = 'padding:.7rem;background:#25D366;color:white;border:0;border-radius:8px;cursor:pointer;';
+                wa.onclick = () => { window.open(`https://wa.me/${String(contact.phone).replace(/[^0-9]/g,'')}?text=${encodeURIComponent(buildEmergencyMessage(profile))}`, '_blank', 'noopener'); };
+                row.append(call, wa); box.appendChild(row);
+            });
+
+            const sms = document.createElement('button');
+            sms.textContent = '📩 Open Emergency SMS';
+            sms.style.cssText = 'width:100%;padding:.75rem;background:#455a64;color:white;border:0;border-radius:8px;cursor:pointer;margin-top:.5rem;';
+            sms.onclick = () => {
+                const numbers = allContacts.map(c => c.phone).filter(Boolean).join(',');
+                if (!numbers) { alert('Please add an emergency contact first.'); return; }
+                window.location.href = `sms:${numbers}?body=${encodeURIComponent(buildEmergencyMessage(profile))}`;
+            };
+            box.appendChild(sms);
+            statusDiv.appendChild(box);
+        }
+
+        async function logEmergencyToServer() {
+            if (!currentLocation) return null;
+            const token = localStorage.getItem('authToken');
+            const body = {
+                lat: currentLocation.lat,
+                lon: currentLocation.lng,
+                accuracy: currentLocation.accuracy,
+                symptoms: [],
+                contacts_notified: 0,
+                hospitals_notified: 0,
+                emergency_services_called: false
+            };
+            try {
+                const response = await fetch('/api/sos/', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json', ...authHeaders()},
+                    body: JSON.stringify(body)
+                });
+                const data = await response.json();
+                if (!response.ok) throw new Error(data.error || 'SOS log failed');
+                localStorage.setItem('lastEmergencyId', String(data.id));
+                const n = data.notifications || {};
+                if ((n.sms_sent || 0) + (n.whatsapp_sent || 0) > 0) {
+                    addStatus(`✅ Automatic contact alert sent (${(n.sms_sent || 0) + (n.whatsapp_sent || 0)} delivery${((n.sms_sent || 0) + (n.whatsapp_sent || 0)) === 1 ? '' : 'ies'})`, 'success');
+                } else {
+                    addStatus('ℹ️ Emergency saved. Automatic contact messaging needs Twilio configuration.', 'loading');
+                }
+                return data;
+            } catch (error) {
+                console.warn(error);
+                addStatus('⚠️ Server log unavailable. Local emergency actions remain available.', 'error');
+                return null;
+            }
+        }
+
+        async function notifyNearbyHospitals(message, hospitals) {
+            const token = localStorage.getItem('authToken');
+            if (!token) {
+                addStatus('ℹ️ Log in to enable server-side hospital notifications.', 'loading');
+                return;
+            }
+            const withPhones = hospitals.filter(h => h.phone).slice(0, 5);
+            if (!withPhones.length) {
+                addStatus('ℹ️ Nearby facilities were found, but none has a public phone number to message.', 'loading');
+                return;
+            }
+            try {
+                const response = await fetch('/api/sos/notify-hospitals/', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json', ...authHeaders()},
+                    body: JSON.stringify({hospitals: withPhones, message})
+                });
+                const data = await response.json();
+                if (!response.ok) throw new Error(data.error || 'Hospital notification failed');
+                if (data.sent > 0) addStatus(`✅ Emergency alert sent to ${data.sent} nearby facility${data.sent === 1 ? '' : 'ies'}.`, 'success');
+                else addStatus('ℹ️ Hospital alerts could not be sent because the SMS provider is not configured.', 'loading');
+            } catch (error) {
+                console.warn(error);
+                addStatus('⚠️ Nearby hospital notification failed. Use the call buttons shown above.', 'error');
+            }
+        }
+
+        // Backward-compatible helpers for older markup.
+        function callEmergencyContacts() { renderEmergencyActions(loadEmergencyProfile(), loadEmergencyContacts(), [], null); }
+        function callContact(contact) { if (contact && contact.phone) window.location.href = `tel:${contact.phone}`; }
+        function call112Emergency() { window.location.href = 'tel:112'; }
+        function sendEmergencyAlerts() { renderEmergencyActions(loadEmergencyProfile(), loadEmergencyContacts(), [], null); }
+
+        function shareMedicalProfile(profile) {
+            profile = profile || loadEmergencyProfile();
+            addStatus('🩺 Medical profile loaded for emergency use', 'success');
+            const profileDiv = document.createElement('div');
+            profileDiv.style.cssText = 'background:#fff3cd;padding:1rem;border-radius:8px;margin-top:1rem;border-left:4px solid #f39c12;text-align:left;';
+            profileDiv.innerHTML = `
+                <h4 style="color:#856404;margin-bottom:.6rem;">📋 Medical Profile</h4>
+                <p style="font-size:.85rem;color:#856404;margin:0;line-height:1.6;">
+                    <strong>Name:</strong> ${escapeHtml(profile.name || 'Not set')}<br>
+                    <strong>Age:</strong> ${escapeHtml(profile.age || 'Not set')}<br>
+                    <strong>Gender:</strong> ${escapeHtml(profile.gender || 'Not set')}<br>
+                    <strong>Blood Group:</strong> ${escapeHtml(profile.blood || 'Unknown')}<br>
+                    <strong>Allergies:</strong> ${escapeHtml(profile.allergies || 'None')}<br>
+                    <strong>Conditions:</strong> ${escapeHtml(profile.conditions || 'None')}<br>
+                    <strong>Medications:</strong> ${escapeHtml(profile.meds || 'None')}<br>
+                    <strong>Previous Surgeries:</strong> ${escapeHtml(profile.surgeries || 'None')}<br>
+                    <strong>Special Needs:</strong> ${escapeHtml(profile.special_needs || 'None')}
+                </p>`;
+            document.getElementById('statusList').appendChild(profileDiv);
+        }
+
+        // Add status message
+        function addStatus(message, type, id) {
+            const statusList = document.getElementById('statusList');
+            
+            // Check if status with this ID exists
+            if (id && document.getElementById(id)) {
+                return;
+            }
+            
+            const item = document.createElement('div');
+            item.className = `status-item ${type}`;
+            if (id) item.id = id;
+            
+            let icon = '⏳';
+            if (type === 'success') icon = '✅';
+            if (type === 'error') icon = '❌';
+            if (type === 'loading') icon = '⏳';
+            
+            item.innerHTML = `<span>${icon}</span> ${message}`;
+            statusList.appendChild(item);
+            
+            // Scroll to bottom
+            statusList.scrollTop = statusList.scrollHeight;
+        }
+
+        // Save emergency report
+        function saveEmergencyReport() {
+            const profile = loadEmergencyProfile();
+            const reports = JSON.parse(localStorage.getItem('emergencyReports')) || [];
+            
+            reports.unshift({
+                id: Date.now(),
+                timestamp: new Date().toLocaleString(),
+                user: profile.name || localStorage.getItem('userName') || 'User',
+                location: currentLocation,
+                medicalInfo: {
+                    blood: profile.blood,
+                    allergies: profile.allergies,
+                    conditions: profile.conditions,
+                    medications: profile.meds
+                },
+                contactsNotified: loadEmergencyContacts().length,
+                status: 'Active'
+            });
+            
+            localStorage.setItem('emergencyReports', JSON.stringify(reports));
+        }
+
+        // Cancel Emergency
+        function cancelEmergency() {
+            if (!confirm('Are you sure you want to cancel the emergency?')) return;
+
+            emergencyActive = false;
+            document.getElementById('emergencyActive').classList.remove('active');
+            
+            // Stop location tracking
+            if (locationWatcher) {
+                navigator.geolocation.clearWatch(locationWatcher);
+                locationWatcher = null;
+            }
+            
+            // Clear status
+            document.getElementById('statusList').innerHTML = '';
+            
+            alert('✅ Emergency cancelled');
+            window.location.href = 'index.html';
+        }
+
+        // SOS is intentionally user-triggered. The page never activates an emergency on load.
+
+    </script>
+</body>
+
+</html>

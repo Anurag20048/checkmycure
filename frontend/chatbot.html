@@ -1,0 +1,330 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="0">
+    <title>Health Chatbot - Check MyCure</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link rel="manifest" href="manifest.json">
+</head>
+
+<body>
+    <!-- Force clear old caches and service workers immediately -->
+    <script>
+        (async function clearOldCache() {
+            // Clear all caches
+            if ('caches' in window) {
+                const cacheNames = await caches.keys();
+                for (const name of cacheNames) {
+                    if (name.includes('mycure-cache') && !name.includes('v2')) {
+                        await caches.delete(name);
+                        console.log('Deleted old cache:', name);
+                    }
+                }
+            }
+            
+            // Update service worker
+            if ('serviceWorker' in navigator) {
+                const registration = await navigator.serviceWorker.getRegistration();
+                if (registration) {
+                    await registration.update();
+                    console.log('Service worker updated');
+                }
+            }
+        })();
+    </script>
+    
+    <header class="site-header">
+        <div class="header-left">
+            <div class="logo-row">
+                <img src="logo.png" alt="Logo" class="logo">
+                <h1 class="logo-text">Check My Cure</h1>
+            </div>
+
+            <nav class="main-nav">
+                <ul class="nav-links">
+                    <li><a href="index.html">Home</a></li>
+                    <li><a href="about.html">About Us</a></li>
+                    <li><a href="contact.html">Contact</a></li>
+                </ul>
+            </nav>
+        </div>
+
+        <div class="header-center">
+            <div class="section-nav">
+                <button onclick="window.location.href='index.html'">Onboarding</button>
+                <button onclick="window.location.href='symptom-checker.html'">Symptoms</button>
+                <button onclick="window.location.href='chatbot.html'">Chatbot</button>
+                <button onclick="window.location.href='nearby-clinics.html'">Find NearBy Clinics</button>
+            </div>
+        </div>
+
+        <div class="header-right">
+            <span id="welcomeMessage" class="welcome-message"></span>
+
+            <div class="profile-menu">
+                <button class="profile-icon" id="profileBtn">
+                    <i class="fas fa-user-circle"></i>
+                </button>
+
+                <div class="profile-dropdown" id="profileDropdown">
+                    <a href="profile.html">Profile</a>
+                    <a href="dashboard.html">Dashboard</a>
+                    <a href="settings.html">Settings</a>
+                    <a href="#" id="logoutLink">Logout</a>
+                </div>
+            </div>
+        </div>
+        <div id="google_translate_element"></div>
+
+        <script type="text/javascript">
+            function googleTranslateElementInit() {
+                new google.translate.TranslateElement(
+                    {
+                        pageLanguage: 'en',
+                        layout: google.translate.TranslateElement.InlineLayout.SIMPLE
+                    },
+                    'google_translate_element'
+                );
+            }
+        </script>
+
+        <script src="//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit">
+        </script>
+
+    </header>
+
+    <main class="chatbot-page">
+        <section id="chatbot" class="section active">
+            <div class="chatbot-container">
+                <div class="chatbot-header">
+                    <h2>🤖 Health Chatbot</h2>
+                    <p class="chatbot-subtitle">
+                        Ask about a symptom or health topic for general information
+                    </p>
+                    <p class="chatbot-disclaimer">This assistant provides general health information. It does not diagnose conditions or prescribe treatment.</p>
+                </div>
+
+                <!-- Quick Symptom Selection -->
+                <div class="symptoms-quick-select" style="margin-bottom: 1rem; padding: 1rem; background: #f8f9fa; border-radius: 12px;">
+                    <h4 style="margin-bottom: 0.75rem; color: #2c3e50; font-size: 0.95rem;">⚡ Quick Symptom Selection</h4>
+                    <div style="display: flex; flex-wrap: wrap; gap: 0.5rem;">
+                        <button class="symptom-btn" onclick="askAboutSymptom('fever')">🤒 Fever</button>
+                        <button class="symptom-btn" onclick="askAboutSymptom('headache')">🧠 Headache</button>
+                        <button class="symptom-btn" onclick="askAboutSymptom('cough')">😷 Cough</button>
+                        <button class="symptom-btn" onclick="askAboutSymptom('cold')">🤧 Cold</button>
+                        <button class="symptom-btn" onclick="askAboutSymptom('stomach pain')">🤢 Stomach Pain</button>
+                        <button class="symptom-btn" onclick="askAboutSymptom('nausea')">😵 Nausea</button>
+                        <button class="symptom-btn" onclick="askAboutSymptom('diarrhea')">💩 Diarrhea</button>
+                        <button class="symptom-btn" onclick="askAboutSymptom('vomiting')">🤮 Vomiting</button>
+                        <button class="symptom-btn" onclick="askAboutSymptom('chest pain')">💔 Chest Pain</button>
+                        <button class="symptom-btn" onclick="askAboutSymptom('breathing difficulty')">😮‍💨 Breathing</button>
+                        <button class="symptom-btn" onclick="askAboutSymptom('back pain')">🦴 Back Pain</button>
+                        <button class="symptom-btn" onclick="askAboutSymptom('joint pain')">🦵 Joint Pain</button>
+                        <button class="symptom-btn" onclick="askAboutSymptom('fatigue')">😴 Fatigue</button>
+                        <button class="symptom-btn" onclick="askAboutSymptom('dizziness')">🌀 Dizziness</button>
+                        <button class="symptom-btn" onclick="askAboutSymptom('sore throat')">🗣️ Sore Throat</button>
+                        <button class="symptom-btn" onclick="askAboutSymptom('runny nose')">👃 Runny Nose</button>
+                        <button class="symptom-btn" onclick="askAboutSymptom('body aches')">💪 Body Aches</button>
+                        <button class="symptom-btn" onclick="askAboutSymptom('skin rash')">🟥 Skin Rash</button>
+                        <button class="symptom-btn" onclick="askAboutSymptom('ear pain')">👂 Ear Pain</button>
+                        <button class="symptom-btn" onclick="askAboutSymptom('eye pain')">👁️ Eye Pain</button>
+                        <button class="symptom-btn" onclick="askAboutSymptom('toothache')">🦷 Toothache</button>
+                        <button class="symptom-btn" onclick="askAboutSymptom('insomnia')">😵 Insomnia</button>
+                        <button class="symptom-btn" onclick="askAboutSymptom('anxiety')">😰 Anxiety</button>
+                        <button class="symptom-btn" onclick="askAboutSymptom('depression')">😔 Depression</button>
+                        <button class="symptom-btn" onclick="askAboutSymptom('diabetes')">🩸 Diabetes</button>
+                        <button class="symptom-btn" onclick="askAboutSymptom('blood pressure')">💉 Blood Pressure</button>
+                        <button class="symptom-btn" onclick="askAboutSymptom('allergies')">🤧 Allergies</button>
+                        <button class="symptom-btn" onclick="askAboutSymptom('constipation')">🚽 Constipation</button>
+                        <button class="symptom-btn" onclick="askAboutSymptom('weight loss')">⚖️ Weight Loss</button>
+                        <button class="symptom-btn" onclick="askAboutSymptom('irregular periods')">📅 Irregular Periods</button>
+                    </div>
+                </div>
+
+                <div id="chat-messages" class="chat-messages-box"></div>
+                <!-- Nearby hospitals (chatbot only) -->
+                <div id="hospitalResults" style="
+    display:none;
+    margin:12px 0;
+    padding:12px;
+    border-radius:10px;
+    background:#f5f9ff;
+    border:1px solid #d0e2ff;
+">
+                    <h4>🏥 Nearby Hospitals</h4>
+                    <div id="hospitalList"></div>
+                </div>
+
+                <div id="ambulanceTracking" style="display:none; margin-top:15px;">
+                    <h4>🚑 Ambulance En Route</h4>
+                    <div id="ambulanceMap" style="height:300px; border-radius:10px;"></div>
+                    <p id="ambulanceStatus">Connecting to ambulance...</p>
+                </div>
+
+                <div class="chat-input-container">
+
+                    <input type="text" id="chat-input" placeholder="Ask a health question..."
+                        onkeypress="if(event.key==='Enter') sendMessage()">
+
+                    <button class="btn-send" onclick="sendMessage()">
+                        <i class="fas fa-paper-plane"></i>
+                    </button>
+
+                    <button class="btn-speak" onclick="startVoiceChatInput()">
+                        <i class="fas fa-microphone"></i>
+                    </button>
+
+                    <button class="btn-speak" onclick="speakLastMessage()">
+                        <i class="fas fa-volume-up"></i>
+                    </button>
+                </div>
+
+                <div class="chatbot-disclaimer">
+                    <small>
+                        ⚠️ This chatbot provides general information only.
+                        Always consult a healthcare professional.
+                    </small>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer class="site-footer">
+        <div class="footer-container">
+
+            <div class="footer-brand">
+                <img src="logo.png" alt="Check MyCure logo">
+                <p>
+                    Empowering health through AI technology.
+                    Get instant disease predictions and emergency assistance anytime, anywhere.
+                </p>
+            </div>
+
+            <div class="footer-links">
+                <h4>Quick Links</h4>
+                <a href="index.html">Home</a>
+                <a href="about.html">About</a>
+                <a href="contact.html">Contact</a>
+            </div>
+
+            <div class="footer-social">
+                <h4>Follow Us</h4>
+                <div class="social-icons">
+                    <a href="#"><i class="fab fa-facebook-f"></i></a>
+                    <a href="#"><i class="fab fa-twitter"></i></a>
+                    <a href="#"><i class="fab fa-instagram"></i></a>
+                    <a href="#"><i class="fab fa-linkedin-in"></i></a>
+                </div>
+            </div>
+
+        </div>
+
+        <div class="footer-bottom">
+            © 2026 Check MyCure. All rights reserved.
+            <a href="#">Medical Disclaimer</a>
+        </div>
+    </footer>
+
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script src="app.js"></script>
+<script>
+        async function checkMyCureChatbotOverride() {
+            const input = document.getElementById('chat-input');
+            if (!input || !input.value.trim()) return;
+            const message = input.value.trim();
+            input.value = '';
+            appendMessage(message, 'user');
+            const typing = document.createElement('div');
+            typing.className = 'chat-bot';
+            typing.textContent = 'Typing...';
+            typing.id = 'chat-typing';
+            document.getElementById('chat-messages')?.appendChild(typing);
+            try {
+                const token = localStorage.getItem('authToken');
+                const response = await fetch('/api/chatbot/', {
+                    method: 'POST',
+                    headers: {'Content-Type':'application/json', ...(token ? {'Authorization':`Token ${token}`} : {})},
+                    body: JSON.stringify({message, language: localStorage.getItem('selectedLanguage') || 'en'})
+                });
+                const data = await response.json();
+                if (!response.ok) throw new Error(data.error || 'Chatbot request failed');
+                appendMessage(data.response || 'I could not generate a response.', 'bot');
+            } catch (error) {
+                // Keep the chatbot usable even if the API is temporarily unavailable.
+                // The local response is informational only and does not claim a diagnosis.
+                const fallback = (typeof generateChatbotResponse === 'function')
+                    ? generateChatbotResponse(message.toLowerCase())
+                    : 'I can provide general health information. Please try again in a moment.';
+                appendMessage(fallback, 'bot');
+                console.warn('Chatbot API unavailable; used local fallback.', error);
+            } finally {
+                document.getElementById('chat-typing')?.remove();
+            }
+        }
+        function sendMessage() { return checkMyCureChatbotOverride(); }
+    </script>
+    <script src="https://cdn.socket.io/4.5.4/socket.io.min.js"></script>
+    
+    <style>
+        .chatbot-disclaimer { margin: .5rem auto 0; max-width: 720px; font-size: .82rem; color: #6b7280; }
+        .symptom-btn {
+            padding: 0.5rem 0.75rem;
+            background: white;
+            border: 2px solid #667eea;
+            border-radius: 20px;
+            color: #667eea;
+            font-size: 0.85rem;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-weight: 500;
+        }
+        
+        .symptom-btn:hover {
+            background: #667eea;
+            color: white;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+        }
+        
+        .symptom-btn:active {
+            transform: translateY(0);
+        }
+    </style>
+    
+    <script>
+        function askAboutSymptom(symptom) {
+            document.getElementById('chat-input').value = symptom;
+            sendMessage();
+        }
+        
+        // Clear old chat history and show welcome message after window fully loads
+        window.addEventListener('load', function() {
+            // Clear ALL localStorage chat-related items
+            localStorage.removeItem('chatHistory');
+            localStorage.removeItem('chatMessages');
+            
+            // Clear the chat container completely
+            const chatBox = document.getElementById('chat-messages');
+            if (chatBox) {
+                chatBox.innerHTML = '';
+                
+                // Add welcome message
+                const msgDiv = document.createElement('div');
+                msgDiv.className = 'chat-bot';
+                msgDiv.innerText = '👋 Hello! I\'m your Health Assistant. How can I help you today? You can ask me about symptoms, health conditions, or click on the quick symptom buttons above.';
+                chatBox.appendChild(msgDiv);
+                chatBox.scrollTop = chatBox.scrollHeight;
+            }
+        });
+    </script>
+
+</body>
+
+</html>

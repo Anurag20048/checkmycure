@@ -1,16 +1,16 @@
 # Check MyCure Eye Health Rasa Assistant
 
-Optional Rasa conversational layer for the eye-health module.
+This is the optional Rasa conversational layer for the eye-health module.
 
 ## Run Rasa
 
-From this folder:
+Install the version listed in `backend/requirements-rasa.txt`, then from this folder run:
 
-```powershell
+```bash
 rasa train
 rasa run --enable-api --cors "*" --port 5005
 ```
 
-The Django `/api/eye-chat/` endpoint uses Rasa when it is available and a safe local fallback when it is not.
+The Django `/api/eye-chat/` endpoint sends messages to Rasa when it is available. If Rasa is not running, Check MyCure uses a safe local fallback so the eye page remains usable.
 
-The assistant provides general eye-health information and does not diagnose eye disease.
+The conversational assistant provides general health information and does not diagnose eye disease.

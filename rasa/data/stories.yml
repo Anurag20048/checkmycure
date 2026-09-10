@@ -1,0 +1,16 @@
+version: "3.1"
+stories:
+- story: eye result conversation
+  steps:
+  - intent: greet
+  - action: utter_greet
+  - intent: eye_screening_result
+  - action: utter_eye_screening_result
+- story: symptom conversation
+  steps:
+  - intent: greet
+  - action: utter_greet
+  - intent: eye_redness
+  - action: utter_eye_redness
+  - intent: prevention
+  - action: utter_prevention

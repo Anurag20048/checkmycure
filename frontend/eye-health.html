@@ -1,0 +1,842 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Eye Health Detection - Check MyCure</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link rel="manifest" href="manifest.json">
+    <style>
+        .eye-health-container {
+            max-width: 1200px;
+            margin: 2rem auto;
+            padding: 2rem;
+        }
+
+        .page-header {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        .page-header h1 {
+            color: #2c3e50;
+            font-size: 2.5rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .page-header p {
+            color: #7f8c8d;
+            font-size: 1.1rem;
+        }
+
+        .detection-modes {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        .mode-card {
+            background: white;
+            border-radius: 15px;
+            padding: 2rem;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            text-align: center;
+            transition: transform 0.3s;
+        }
+
+        .mode-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 6px 20px rgba(0,0,0,0.15);
+        }
+
+        .mode-card i {
+            font-size: 3rem;
+            color: #667eea;
+            margin-bottom: 1rem;
+        }
+
+        .mode-card h3 {
+            color: #2c3e50;
+            margin-bottom: 1rem;
+        }
+
+        .btn-mode {
+            padding: 0.75rem 2rem;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 1rem;
+            font-weight: 600;
+            transition: all 0.3s;
+        }
+
+        .btn-mode:hover {
+            transform: scale(1.05);
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        #webcamContainer, #uploadContainer {
+            display: none;
+            background: white;
+            border-radius: 15px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+
+        #webcamVideo {
+            width: 100%;
+            max-width: 640px;
+            border-radius: 10px;
+            display: block;
+            margin: 0 auto 1rem;
+        }
+
+        #webcamCanvas {
+            display: none;
+        }
+
+        .upload-area {
+            border: 3px dashed #667eea;
+            border-radius: 15px;
+            padding: 3rem;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .upload-area:hover {
+            background: #f8f9fa;
+            border-color: #764ba2;
+        }
+
+        .upload-area i {
+            font-size: 4rem;
+            color: #667eea;
+            margin-bottom: 1rem;
+        }
+
+        #fileInput {
+            display: none;
+        }
+
+        #imagePreview {
+            max-width: 100%;
+            max-height: 500px;
+            margin: 1rem auto;
+            display: none;
+            border-radius: 10px;
+        }
+
+        .detection-controls {
+            text-align: center;
+            margin: 1.5rem 0;
+        }
+
+        .btn-detect {
+            padding: 1rem 3rem;
+            background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+            color: white;
+            border: none;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 1.1rem;
+            font-weight: 600;
+            margin: 0 0.5rem;
+        }
+
+        .btn-detect:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .btn-cancel {
+            padding: 1rem 3rem;
+            background: #e74c3c;
+            color: white;
+            border: none;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 1.1rem;
+            font-weight: 600;
+        }
+
+        #resultsContainer {
+            display: none;
+            background: white;
+            border-radius: 15px;
+            padding: 2rem;
+            margin-top: 2rem;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+
+        .result-image {
+            max-width: 100%;
+            border-radius: 10px;
+            margin-bottom: 1.5rem;
+        }
+
+        .result-info {
+            background: #f8f9fa;
+            padding: 1.5rem;
+            border-radius: 10px;
+            margin-bottom: 1rem;
+        }
+
+        .disease-badge {
+            display: inline-block;
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            font-weight: 600;
+            margin-bottom: 1rem;
+        }
+
+        .severity-normal {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .severity-mild {
+            background: #fff3cd;
+            color: #856404;
+        }
+
+        .severity-moderate {
+            background: #f8d7da;
+            color: #721c24;
+        }
+
+        .severity-severe {
+            background: #f5c6cb;
+            color: #721c24;
+        }
+
+        .confidence-meter {
+            background: #e9ecef;
+            height: 30px;
+            border-radius: 15px;
+            overflow: hidden;
+            margin: 1rem 0;
+        }
+
+        .confidence-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #11998e 0%, #38ef7d 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 600;
+            transition: width 1s ease;
+        }
+
+        .recommendations {
+            background: #e3f2fd;
+            padding: 1.5rem;
+            border-radius: 10px;
+            border-left: 4px solid #2196f3;
+            white-space: pre-line;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 2rem;
+        }
+
+        .spinner {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #667eea;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 1rem;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .history-section {
+            margin-top: 3rem;
+        }
+
+        .history-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 1.5rem;
+            margin-top: 1.5rem;
+        }
+
+        .history-card {
+            background: white;
+            border-radius: 10px;
+            padding: 1rem;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            cursor: pointer;
+            transition: transform 0.3s;
+        }
+
+        .history-card:hover {
+            transform: translateY(-3px);
+        }
+
+        .history-image {
+            width: 100%;
+            height: 150px;
+            object-fit: cover;
+            border-radius: 8px;
+            margin-bottom: 0.75rem;
+        }
+
+        @media (max-width: 768px) {
+            .detection-modes {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header class="site-header">
+        <div class="header-left">
+            <div class="logo-row">
+                <img src="logo.png" alt="Logo" class="logo" onclick="window.location.href='index.html'" style="cursor: pointer;">
+                <h1 class="logo-text" onclick="window.location.href='index.html'" style="cursor: pointer;">Check My Cure</h1>
+            </div>
+            <nav class="main-nav">
+                <ul class="nav-links">
+                    <li><a href="index.html">Home</a></li>
+                    <li><a href="about.html">About Us</a></li>
+                    <li><a href="admin-login.html" style="color: #667eea; font-weight: 600;"><i class="fas fa-shield-alt"></i> Admin</a></li>
+                    <li><a href="contact.html">Contact</a></li>
+                </ul>
+            </nav>
+        </div>
+
+        <div class="header-center">
+            <div class="section-nav">
+                <button onclick="window.location.href='index.html'">Onboarding</button>
+                <button onclick="window.location.href='symptom-checker.html'">Symptoms</button>
+                <button onclick="window.location.href='chatbot.html'">Chatbot</button>
+                <button class="active" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);" onclick="window.location.href='eye-health.html'"><i class="fas fa-eye"></i> Eye Health</button>
+                <button onclick="window.location.href='nearby-clinics.html'">Find NearBy Clinics</button>
+            </div>
+        </div>
+
+        <div class="header-right">
+            <span id="welcomeMessage" class="welcome-message"></span>
+            <div class="profile-menu">
+                <button class="profile-icon" id="profileBtn">
+                    <i class="fas fa-user-circle"></i>
+                </button>
+                <div class="profile-dropdown" id="profileDropdown">
+                    <a href="profile.html"><i class="fas fa-user"></i> Profile</a>
+                    <a href="dashboard.html"><i class="fas fa-chart-line"></i> Dashboard</a>
+                    <a href="settings.html"><i class="fas fa-cog"></i> Settings</a>
+                    <a href="#" id="logoutLink"><i class="fas fa-sign-out-alt"></i> Logout</a>
+                </div>
+            </div>
+        </div>
+
+        <div id="google_translate_element"></div>
+        <script type="text/javascript">
+            function googleTranslateElementInit() {
+                new google.translate.TranslateElement(
+                    { pageLanguage: 'en', layout: google.translate.TranslateElement.InlineLayout.SIMPLE },
+                    'google_translate_element'
+                );
+            }
+        </script>
+        <script src="//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
+    </header>
+
+    <main class="eye-health-container">
+        <div class="page-header">
+            <h1>👁️ Eye Health Detection</h1>
+            <p>AI-powered eye disease detection using advanced YOLO technology</p>
+        </div>
+
+        <div class="detection-modes">
+            <div class="mode-card">
+                <i class="fas fa-video"></i>
+                <h3>Webcam Capture</h3>
+                <p>Use your device camera for instant eye scan</p>
+                <button class="btn-mode" onclick="startWebcam()">
+                    <i class="fas fa-camera"></i> Start Webcam
+                </button>
+            </div>
+
+            <div class="mode-card">
+                <i class="fas fa-upload"></i>
+                <h3>Upload Image</h3>
+                <p>Upload an existing eye image for analysis</p>
+                <button class="btn-mode" onclick="showUpload()">
+                    <i class="fas fa-cloud-upload-alt"></i> Upload Image
+                </button>
+            </div>
+        </div>
+
+        <!-- Webcam Container -->
+        <div id="webcamContainer">
+            <h3 style="text-align: center; margin-bottom: 1rem;">Position your eye in the frame</h3>
+            <video id="webcamVideo" autoplay playsinline></video>
+            <canvas id="webcamCanvas"></canvas>
+            <div class="detection-controls">
+                <button class="btn-detect" onclick="captureImage()">
+                    <i class="fas fa-camera"></i> Capture & Analyze
+                </button>
+                <button class="btn-cancel" onclick="stopWebcam()">
+                    <i class="fas fa-times"></i> Cancel
+                </button>
+            </div>
+        </div>
+
+        <!-- Upload Container -->
+        <div id="uploadContainer">
+            <div class="upload-area" onclick="document.getElementById('fileInput').click()">
+                <i class="fas fa-cloud-upload-alt"></i>
+                <h3>Click to upload or drag & drop</h3>
+                <p>Supported formats: JPG, PNG, JPEG</p>
+                <input type="file" id="fileInput" accept="image/*" onchange="handleFileSelect(event)">
+            </div>
+            <img id="imagePreview" alt="Preview">
+            <div class="detection-controls" id="uploadControls" style="display: none;">
+                <button class="btn-detect" onclick="analyzeUploadedImage()">
+                    <i class="fas fa-search"></i> Analyze Image
+                </button>
+                <button class="btn-cancel" onclick="resetUpload()">
+                    <i class="fas fa-redo"></i> Reset
+                </button>
+            </div>
+        </div>
+
+        <!-- Results Container -->
+        <div id="resultsContainer" style="display: none;">
+            <h2 style="text-align: center; margin-bottom: 1.5rem;">Detection Results</h2>
+            <div id="loadingIndicator" class="loading" style="display: none;">
+                <div class="spinner"></div>
+                <p>Analyzing your eye image...</p>
+            </div>
+            <div id="resultsContent" style="display: none;">
+                <img id="processedImage" class="result-image" alt="Processed">
+                <div class="result-info">
+                    <h3>Detected Condition</h3>
+                    <span id="diseaseBadge" class="disease-badge"></span>
+                    <h4>Confidence Level</h4>
+                    <div class="confidence-meter">
+                        <div id="confidenceFill" class="confidence-fill" style="width: 0%;">0%</div>
+                    </div>
+                </div>
+                <div class="recommendations" id="recommendations"></div>
+                <div style="text-align: center; margin-top: 1.5rem;">
+                    <button class="btn-detect" onclick="resetDetection()">
+                        <i class="fas fa-redo"></i> New Scan
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <section id="eyeChat" style="background:white;border-radius:15px;padding:2rem;margin-top:2rem;box-shadow:0 4px 15px rgba(0,0,0,0.1);">
+            <h2 style="text-align:center;margin-bottom:.5rem;">🤖 Ask About Your Eye Health</h2>
+            <p style="text-align:center;color:#667085;margin-bottom:1.2rem;">Rasa-powered eye-health conversation with a safe local fallback.</p>
+            <div id="eyeChatMessages" style="max-height:320px;overflow:auto;background:#f8f9fa;border-radius:12px;padding:1rem;margin-bottom:1rem;"></div>
+            <div style="display:flex;gap:.75rem;">
+                <input id="eyeChatInput" type="text" placeholder="e.g. my eyes are itchy, explain my scan..." style="flex:1;padding:.9rem 1rem;border:1px solid #d0d5dd;border-radius:10px;">
+                <button class="btn-detect" type="button" onclick="sendEyeChat()">Ask</button>
+            </div>
+            <small style="display:block;margin-top:.75rem;color:#667085;">General information only. This assistant does not diagnose eye disease.</small>
+        </section>
+
+        <!-- History Section -->
+        <div class="history-section">
+            <h2>📊 Your Detection History</h2>
+            <div id="historyGrid" class="history-grid"></div>
+        </div>
+    </main>
+
+    <!-- Floating Read Aloud -->
+    <div class="read-aloud-container">
+        <button id="readAloudToggle" class="read-aloud-btn">
+            <i class="fas fa-volume-up"></i>
+        </button>
+        <div id="readAloudPanel" class="read-aloud-panel">
+            <button onclick="readWholePage()">📄 Read Whole Page</button>
+            <button onclick="readSelectedText()">✂ Read Selected Text</button>
+            <label>
+                Speed:
+                <input type="range" id="speechSpeed" min="0.5" max="1.5" step="0.1" value="1">
+                <span id="speedValue">1x</span>
+            </label>
+            <button class="stop-btn" onclick="stopReading()">⏹ Stop</button>
+        </div>
+    </div>
+
+    <button class="emergency-fab" onclick="window.location.href='emergency-sos.html'" aria-label="Emergency SOS">🚨</button>
+
+    <script>
+        let stream = null;
+        let uploadedFile = null;
+        const API_BASE = '/api';
+        let serverAvailable = false;
+
+        // Check if backend server is running
+        async function checkServer() {
+            try {
+                const response = await fetch(`${API_BASE}/predict/`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ symptoms: ['test'] })
+                });
+                serverAvailable = true;
+                console.log('Backend server is running');
+            } catch (err) {
+                serverAvailable = false;
+                console.log('Backend server not available');
+            }
+        }
+        checkServer();
+
+        // Start Webcam
+        async function startWebcam() {
+            try {
+                stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'user' } });
+                document.getElementById('webcamVideo').srcObject = stream;
+                document.getElementById('webcamContainer').style.display = 'block';
+                document.getElementById('uploadContainer').style.display = 'none';
+            } catch (err) {
+                alert('Cannot access webcam: ' + err.message);
+            }
+        }
+
+        // Stop Webcam
+        function stopWebcam() {
+            if (stream) {
+                stream.getTracks().forEach(track => track.stop());
+                stream = null;
+            }
+            document.getElementById('webcamContainer').style.display = 'none';
+        }
+
+        // Capture Image from Webcam
+        function captureImage() {
+            const video = document.getElementById('webcamVideo');
+            const canvas = document.getElementById('webcamCanvas');
+            canvas.width = video.videoWidth;
+            canvas.height = video.videoHeight;
+            const ctx = canvas.getContext('2d');
+            ctx.drawImage(video, 0, 0);
+            
+            canvas.toBlob(blob => {
+                analyzeImage(blob, true);
+            }, 'image/jpeg');
+            
+            stopWebcam();
+        }
+
+        // Show Upload Interface
+        function showUpload() {
+            document.getElementById('uploadContainer').style.display = 'block';
+            document.getElementById('webcamContainer').style.display = 'none';
+        }
+
+        // Handle File Selection
+        function handleFileSelect(event) {
+            const file = event.target.files[0];
+            if (file) {
+                uploadedFile = file;
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    const preview = document.getElementById('imagePreview');
+                    preview.src = e.target.result;
+                    preview.style.display = 'block';
+                    document.getElementById('uploadControls').style.display = 'block';
+                };
+                reader.readAsDataURL(file);
+            }
+        }
+
+        // Reset Upload
+        function resetUpload() {
+            document.getElementById('fileInput').value = '';
+            document.getElementById('imagePreview').style.display = 'none';
+            document.getElementById('uploadControls').style.display = 'none';
+            uploadedFile = null;
+        }
+
+        // Analyze Uploaded Image
+        function analyzeUploadedImage() {
+            if (uploadedFile) {
+                analyzeImage(uploadedFile, false);
+            }
+        }
+
+        // Demo mode fallback data
+        const DEMO_RESULTS = {
+            normal: {
+                disease: 'normal',
+                confidence: 92.5,
+                severity: 'normal',
+                recommendations: '✅ HEALTHY EYES - EXCELLENT NEWS!\n\n🎉 Detection Results:\nNo signs of eye disease detected. Your eyes appear healthy and functioning normally.\n\n🚪 Preventive Care Plan:\n\n1. 📅 Regular Eye Exams\n2. 🕶️ UV Protection\n3. 💻 Digital Eye Care (20-20-20 Rule)\n4. 🍽️ Eye-Healthy Nutrition\n5. 💧 Stay Hydrated\n\n👏 Great Job! Keep up these preventive measures!'
+            },
+            cataract: {
+                disease: 'cataract',
+                confidence: 78.3,
+                severity: 'moderate',
+                recommendations: '👁️ CATARACT INDICATORS DETECTED\n\n📖 What is it?\nA cataract is clouding of the eye\'s natural lens.\n\n⚠️ Recommended Actions:\n1. 👨‍⚕️ Schedule appointment with ophthalmologist\n2. 🕶️ Wear UV-blocking sunglasses\n3. 💡 Ensure good lighting at home\n\n💊 Treatment: Surgery (Phacoemulsification) is highly effective with >98% success rate.\n\n📞 Please consult an eye specialist for proper diagnosis.'
+            }
+        };
+
+        // Show demo results when server is unavailable
+        function showDemoResults(imageDataUrl) {
+            document.getElementById('loadingIndicator').style.display = 'none';
+            document.getElementById('resultsContent').style.display = 'block';
+            document.getElementById('processedImage').src = imageDataUrl;
+            document.getElementById('processedImage').style.display = 'block';
+
+            const badge = document.getElementById('diseaseBadge');
+            badge.textContent = 'MODEL NOT INSTALLED';
+            badge.className = 'disease-badge severity-mild';
+
+            const confidenceFill = document.getElementById('confidenceFill');
+            confidenceFill.style.width = '0%';
+            confidenceFill.textContent = 'N/A';
+
+            document.getElementById('recommendations').innerHTML = `
+                <div style="background:#fff3cd;padding:14px;border-radius:8px;border-left:4px solid #f0ad4e;">
+                    <strong>Eye image received successfully.</strong><br><br>
+                    The YOLO eye-disease model is not installed on this computer, so Check MyCure cannot make a disease prediction yet.
+                    This screen is only confirming that the image upload/camera capture works. It is not a medical result.
+                    <br><br><strong>To enable detection:</strong> place your trained <code>best.pt</code> file at <code>backend/models/eye/best.pt</code> or set <code>EYE_MODEL_PATH</code>.
+                </div>`;
+        }
+
+        // Store the current image URL for demo mode
+        let currentImageDataUrl = null;
+
+        // Analyze Image (Webcam or Upload)
+        async function analyzeImage(imageBlob, isWebcam) {
+            document.getElementById('resultsContainer').style.display = 'block';
+            document.getElementById('loadingIndicator').style.display = 'block';
+            document.getElementById('resultsContent').style.display = 'none';
+            document.getElementById('processedImage').style.display = 'block';
+
+            // Convert blob to data URL for preview/demo
+            const previewReader = new FileReader();
+            previewReader.readAsDataURL(imageBlob);
+            previewReader.onloadend = () => {
+                currentImageDataUrl = previewReader.result;
+            };
+
+            try {
+                if (isWebcam) {
+                    // Convert blob to base64 for webcam
+                    const reader = new FileReader();
+                    reader.readAsDataURL(imageBlob);
+                    reader.onloadend = async () => {
+                        try {
+                            const base64data = reader.result;
+                            currentImageDataUrl = base64data;
+                            
+                            const response = await fetch(`${API_BASE}/eye-detection/`, {
+                                method: 'POST',
+                                headers: {
+                                    'Content-Type': 'application/json',
+                                },
+                                body: JSON.stringify({ image_base64: base64data })
+                            });
+                            
+                            await handleResponse(response, base64data);
+                        } catch (error) {
+                            console.log('Server error, using demo mode:', error);
+                            showDemoResults(currentImageDataUrl || document.getElementById('imagePreview').src);
+                        }
+                    };
+                } else {
+                    // Use form data for file upload
+                    const formData = new FormData();
+                    formData.append('image', imageBlob);
+                    
+                    const response = await fetch(`${API_BASE}/eye-detection/`, {
+                        method: 'POST',
+                        body: formData
+                    });
+                    
+                    await handleResponse(response, currentImageDataUrl || document.getElementById('imagePreview').src);
+                }
+            } catch (error) {
+                console.log('Server error, using demo mode:', error);
+                showDemoResults(currentImageDataUrl || document.getElementById('imagePreview').src);
+            }
+        }
+
+        // Handle API Response
+        async function handleResponse(response, fallbackImage) {
+            try {
+                const data = await response.json();
+                
+                document.getElementById('loadingIndicator').style.display = 'none';
+                
+                if (data.success) {
+                    displayResults(data);
+                    loadHistory();
+                } else {
+                    console.log('API returned error, using demo mode:', data.error);
+                    showDemoResults(fallbackImage);
+                }
+            } catch (error) {
+                console.log('Parse error, using demo mode:', error);
+                showDemoResults(fallbackImage);
+            }
+        }
+
+        // Display Results
+        function displayResults(data) {
+            document.getElementById('resultsContent').style.display = 'block';
+            document.getElementById('processedImage').src = data.processed_image;
+            
+            const badge = document.getElementById('diseaseBadge');
+            badge.textContent = data.disease.toUpperCase();
+            badge.className = `disease-badge severity-${data.severity}`;
+            
+            const confidenceFill = document.getElementById('confidenceFill');
+            setTimeout(() => {
+                confidenceFill.style.width = data.confidence + '%';
+                confidenceFill.textContent = data.confidence.toFixed(1) + '%';
+            }, 100);
+            
+            document.getElementById('recommendations').textContent = data.recommendations;
+        }
+
+        // Reset Detection
+        function resetDetection() {
+            document.getElementById('resultsContainer').style.display = 'none';
+            document.getElementById('uploadContainer').style.display = 'none';
+            resetUpload();
+        }
+
+        // Load History
+        async function loadHistory() {
+            const token = localStorage.getItem('authToken');
+            if (!token) return;
+            
+            try {
+                const response = await fetch(`${API_BASE}/eye-detection/history/`, {
+                    headers: {
+                        'Authorization': `Token ${token}`
+                    }
+                });
+                
+                const data = await response.json();
+                displayHistory(data);
+            } catch (error) {
+                console.error('Error loading history:', error);
+            }
+        }
+
+        // Display History
+        function displayHistory(detections) {
+            const grid = document.getElementById('historyGrid');
+            
+            if (!detections || detections.length === 0) {
+                grid.innerHTML = '<p style="text-align: center; color: #7f8c8d;">No detection history yet.</p>';
+                return;
+            }
+            
+            grid.innerHTML = detections.map(det => `
+                <div class="history-card">
+                    <img src="${det.processed_image || det.original_image}" class="history-image" alt="${det.disease}">
+                    <h4>${det.disease}</h4>
+                    <p><strong>Confidence:</strong> ${Number(det.confidence).toFixed(1)}%</p>
+                    <p><small>${new Date(det.created_at).toLocaleDateString()}</small></p>
+                </div>
+            `).join('');
+        }
+
+        function addEyeChatMessage(text, who) {
+            const box = document.getElementById('eyeChatMessages');
+            const row = document.createElement('div');
+            row.style.cssText = 'margin:.55rem 0;padding:.7rem .9rem;border-radius:10px;white-space:pre-line;' + (who === 'user' ? 'background:#e8edff;text-align:right;' : 'background:white;');
+            row.textContent = text;
+            box.appendChild(row);
+            box.scrollTop = box.scrollHeight;
+        }
+
+        async function sendEyeChat() {
+            const input = document.getElementById('eyeChatInput');
+            const message = input.value.trim();
+            if (!message) return;
+            input.value = '';
+            addEyeChatMessage(message, 'user');
+            addEyeChatMessage('Thinking...', 'bot');
+            const box = document.getElementById('eyeChatMessages');
+            try {
+                const response = await fetch(`${API_BASE}/eye-chat/`, {
+                    method: 'POST', headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({message})
+                });
+                const data = await response.json();
+                if (box.lastElementChild) box.lastElementChild.remove();
+                addEyeChatMessage(data.text || data.error || 'I could not process that question.', 'bot');
+            } catch (error) {
+                if (box.lastElementChild) box.lastElementChild.remove();
+                addEyeChatMessage('The eye assistant is temporarily unavailable. Please try again.', 'bot');
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            addEyeChatMessage('Hi! Ask me about eye symptoms, prevention, or your screening result.', 'bot');
+            document.getElementById('eyeChatInput').addEventListener('keydown', (event) => {
+                if (event.key === 'Enter') sendEyeChat();
+            });
+        });
+
+        // Load history on page load
+        window.addEventListener('load', loadHistory);
+
+        // Error handling for network issues
+        window.addEventListener('unhandledrejection', function(event) {
+            console.error('Unhandled promise rejection:', event.reason);
+            document.getElementById('loadingIndicator').style.display = 'none';
+        });
+    </script>
+
+    <footer class="site-footer">
+        <div class="footer-container">
+            <div class="footer-brand">
+                <img src="logo.png" alt="Check MyCure logo">
+                <p>
+                    Empowering health through AI technology.
+                    Get instant disease predictions and emergency assistance anytime, anywhere.
+                </p>
+            </div>
+            <div class="footer-links">
+                <h4>Quick Links</h4>
+                <a href="index.html">Home</a>
+                <a href="about.html">About</a>
+                <a href="contact.html">Contact</a>
+                <a href="eye-health.html">Eye Health</a>
+            </div>
+            <div class="footer-social">
+                <h4>Follow Us</h4>
+                <div class="social-icons">
+                    <a href="#"><i class="fab fa-facebook-f"></i></a>
+                    <a href="#"><i class="fab fa-twitter"></i></a>
+                    <a href="#"><i class="fab fa-instagram"></i></a>
+                    <a href="#"><i class="fab fa-linkedin-in"></i></a>
+                </div>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            © 2026 Check MyCure. All rights reserved.
+            <a href="#">Medical Disclaimer</a>
+        </div>
+    </footer>
+
+    <script src="app.js"></script>
+</body>
+</html>

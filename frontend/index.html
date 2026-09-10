@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Check MyCure</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link rel="manifest" href="manifest.json">
+</head>
+
+<body>
+    <header class="site-header">
+        <div class="header-left">
+            <div class="logo-row">
+                <img src="logo.png" alt="Logo" class="logo">
+                <h1 class="logo-text">Check My Cure</h1>
+            </div>
+
+            <nav class="main-nav">
+                <ul class="nav-links">
+                    <li><a href="index.html">Home</a></li>
+                    <li><a href="about.html">About Us</a></li>
+                    <li><a href="admin-login.html" style="color: #667eea; font-weight: 600;"><i class="fas fa-shield-alt"></i> Admin</a></li>
+                    <li><a href="contact.html">Contact</a></li>
+                </ul>
+            </nav>
+        </div>
+
+        <div class="header-center">
+            <div class="section-nav">
+                <button onclick="window.location.href='index.html'">Onboarding</button>
+                <button onclick="window.location.href='symptom-checker.html'">Symptoms</button>
+                <button onclick="window.location.href='chatbot.html'">Chatbot</button>
+                <button onclick="window.location.href='eye-health.html'"><i class="fas fa-eye"></i> Eye Health</button>
+                <button onclick="window.location.href='nearby-clinics.html'">Find NearBy Clinics</button>
+            </div>
+        </div>
+
+        <div class="header-right">
+            <span id="welcomeMessage" class="welcome-message"></span>
+
+            <div class="profile-menu">
+                <button class="profile-icon" id="profileBtn">
+                    <i class="fas fa-user-circle"></i>
+                </button>
+
+                <div class="profile-dropdown" id="profileDropdown">
+                    <a href="profile.html"><i class="fas fa-user"></i> Profile</a>
+                    <a href="dashboard.html"><i class="fas fa-chart-line"></i> Dashboard</a>
+                    <a href="settings.html"><i class="fas fa-cog"></i> Settings</a>
+                    <a href="#" id="logoutLink"><i class="fas fa-sign-out-alt"></i> Logout</a>
+                </div>
+            </div>
+        </div>
+        <div id="google_translate_element"></div>
+
+        <script type="text/javascript">
+            function googleTranslateElementInit() {
+                new google.translate.TranslateElement(
+                    {
+                        pageLanguage: 'en',
+                        layout: google.translate.TranslateElement.InlineLayout.SIMPLE
+                    },
+                    'google_translate_element'
+                );
+            }
+        </script>
+
+        <script src="//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit">
+        </script>
+
+    </header>
+
+    <main>
+        <!-- Hero -->
+        <section id="hero" class="section active">
+            <div class="hero-inner">
+                <div class="hero-text">
+                    <h2>Onboarding</h2>
+                    <p class="lead">Assess your symptoms and find care solutions</p>
+                    <div class="hero-cta">
+                        <button class="btn-primary" onclick="goToLogin()">Get started</button>
+                        <button class="btn-secondary" onclick="showHowItWorks()">How it works</button>
+
+                    </div>
+                </div>
+                <div class="hero-illustration" aria-hidden="true">
+                    <!-- Illustration placeholder -->
+                </div>
+            </div>
+            <div class="feature-cards">
+                <div class="card" onclick="window.location.href='symptom-checker.html'">
+                    <h3>Symptom Checker</h3>
+                    <p>Evaluate your symptoms</p>
+                </div>
+                <div class="card" onclick="window.location.href='eye-health.html'">
+                    <h3>👁️ Eye Health</h3>
+                    <p>AI-powered eye disease detection</p>
+                </div>
+                <div class="card" onclick="window.location.href='nearby-clinics.html'">
+                    <h3>Nearby Clinics</h3>
+                    <p>Locate care providers</p>
+                </div>
+                <div class="card" onclick="openHistory()">
+                    <h3>History & Records</h3>
+                    <p>Access past assessments</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Symptoms flow: stepper -->
+        <section id="symptoms" class="section">
+            <h2 class="page-title">Select symptoms</h2>
+            <div class="stepper" id="stepper">
+                <div class="step active" data-step="1">1<br><span>Symptoms</span></div>
+                <div class="step" data-step="2">2<br><span>History</span></div>
+                <div class="step" data-step="3">3<br><span>Results</span></div>
+            </div>
+            <div class="step-content" data-step="1">
+                <div class="symptoms-grid">
+                    <div class="symptom" data-symptom="fever">Fever</div>
+                    <div class="symptom" data-symptom="cough">Cough</div>
+                    <div class="symptom" data-symptom="headache">Headache</div>
+                    <div class="symptom" data-symptom="nausea">Nausea</div>
+                    <div class="symptom" data-symptom="fatigue">Fatigue</div>
+                    <div class="symptom" data-symptom="pain">Pain</div>
+                </div>
+                <button class="primary wide" onclick="nextStep()">Next</button>
+            </div>
+            <div class="step-content" data-step="2" style="display:none;">
+                <h3>Provide information</h3>
+                <label>Age<input id="age" type="number" placeholder="Age"></label>
+                <label>Gender<input id="gender" type="text" placeholder="Gender"></label>
+                <label>Relevant medical history<textarea id="history"
+                        placeholder="Relevant medical history..."></textarea></label>
+                <button class="primary wide" onclick="nextStep()">Next</button>
+            </div>
+            <div class="step-content" data-step="3" style="display:none;">
+                <h3>Review</h3>
+                <div id="review"></div>
+                <button class="primary wide" onclick="predictIllness()">Get Results</button>
+            </div>
+        </section>
+        
+        <section class="how-it-works" id="howItWorks" style="display: none;">
+            <div class="how-container">
+
+                <h2>How It Works</h2>
+
+                <div class="how-steps">
+                    <div class="how-step">
+                        <span class="step-number">1</span>
+                        <p><strong>Select symptoms:</strong> Choose one or more symptoms from the list.</p>
+                    </div>
+
+                    <div class="how-step">
+                        <span class="step-number">2</span>
+                        <p><strong>Provide info:</strong> Enter age, gender and relevant history.</p>
+                    </div>
+
+                    <div class="how-step">
+                        <span class="step-number">3</span>
+                        <p><strong>Get prediction:</strong> Our model suggests likely conditions.</p>
+                    </div>
+
+                    <div class="how-step">
+                        <span class="step-number">4</span>
+                        <p><strong>Find care:</strong> Locate nearby clinics on the map.</p>
+                    </div>
+                </div>
+
+                <div class="how-actions">
+                    <button type="button" class="btn-secondary" onclick="hideHowItWorks()">Back</button>
+
+                </div>
+
+            </div>
+        </section>
+
+        <section id="results" class="section">
+            <h2>Find NearBy Clinics</h2>
+            <div id="prediction" aria-live="polite"></div>
+            <div id="suggestions" aria-live="polite"></div>
+            <div class="results-actions">
+                <button onclick="window.location.href='nearby-clinics.html'">Find NearBy Clinics</button>
+                <button onclick="window.location.href='chatbot.html'">Open Chatbot</button>
+            </div>
+        </section>
+        <section id="historySection" class="history-section" style="display:none;">
+            <div class="history-container">
+
+                <h2>History & Records</h2>
+                <p class="history-subtitle">
+                    Your previous symptom checks and predictions
+                </p>
+
+                <div id="historyList" class="history-grid">
+                    <!-- history cards injected here -->
+                </div>
+
+                <button type="button" class="btn-secondary" onclick="backToOnboarding()">
+                    Back
+                </button>
+
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Floating Read Aloud -->
+    <div class="read-aloud-container">
+        <button id="readAloudToggle" class="read-aloud-btn">
+            <i class="fas fa-volume-up"></i>
+        </button>
+
+        <div id="readAloudPanel" class="read-aloud-panel">
+            <button onclick="readWholePage()">📄 Read Whole Page</button>
+            <button onclick="readSelectedText()">✂ Read Selected Text</button>
+
+            <label>
+                Speed:
+                <input type="range" id="speechSpeed" min="0.5" max="1.5" step="0.1" value="1">
+                <span id="speedValue">1x</span>
+            </label>
+
+            <button class="stop-btn" onclick="stopReading()">⏹ Stop</button>
+        </div>
+    </div>
+
+    <button class="emergency-fab" onclick="window.location.href='emergency-sos.html'" aria-label="Emergency SOS">🚨</button>
+
+    <footer class="site-footer">
+        <div class="footer-container">
+
+            <div class="footer-brand">
+                <img src="logo.png" alt="Check MyCure logo">
+                <p>
+                    Empowering health through AI technology.
+                    Get instant disease predictions and emergency assistance anytime, anywhere.
+                </p>
+            </div>
+
+            <div class="footer-links">
+                <h4>Quick Links</h4>
+                <a href="index.html">Home</a>
+                <a href="about.html">About</a>
+                <a href="contact.html">Contact</a>
+                <a href="eye-health.html">Eye Health</a>
+            </div>
+
+            <div class="footer-social">
+                <h4>Follow Us</h4>
+                <div class="social-icons">
+                    <a href="#"><i class="fab fa-facebook-f"></i></a>
+                    <a href="#"><i class="fab fa-twitter"></i></a>
+                    <a href="#"><i class="fab fa-instagram"></i></a>
+                    <a href="#"><i class="fab fa-linkedin-in"></i></a>
+                </div>
+            </div>
+
+        </div>
+
+        <div class="footer-bottom">
+            © 2026 Check MyCure. All rights reserved.
+            <a href="#">Medical Disclaimer</a>
+        </div>
+    </footer>
+
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script src="app.js"></script>
+
+</body>
+
+</html>

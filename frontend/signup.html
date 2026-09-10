@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Sign Up – Check MyCure</title>
+
+    <!-- Main Styles -->
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
+    <link rel="manifest" href="manifest.json">
+    <style>
+        body {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(135deg, #1e78c8, #5bb1b6);
+        }
+
+        .signup-container {
+            background: #ffffff;
+            padding: 3rem 2.5rem;
+            border-radius: 20px;
+            width: 100%;
+            max-width: 450px;
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.15);
+            text-align: center;
+        }
+
+        .signup-logo {
+            width: 70px;
+            height: 70px;
+            margin-bottom: 1rem;
+        }
+
+        .signup-container h2 {
+            margin-bottom: 0.4rem;
+            color: #0b3c68;
+        }
+
+        .signup-container p {
+            font-size: 0.9rem;
+            color: rgba(0, 0, 0, 0.6);
+            margin-bottom: 2rem;
+        }
+
+        .signup-group {
+            text-align: left;
+            margin-bottom: 1.2rem;
+        }
+
+        .signup-group label {
+            display: block;
+            font-size: 0.85rem;
+            margin-bottom: 0.3rem;
+            color: #0b3c68;
+        }
+
+        .signup-group input {
+            width: 100%;
+            padding: 0.75rem 0.8rem;
+            border-radius: 10px;
+            border: 1px solid #d0d7de;
+            outline: none;
+            font-size: 0.95rem;
+        }
+
+        .signup-group input:focus {
+            border-color: #1e78c8;
+        }
+
+        .gender-options {
+            display: flex;
+            gap: 1rem;
+            margin-top: 0.5rem;
+        }
+
+        .gender-options label {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            cursor: pointer;
+            font-size: 0.95rem;
+        }
+
+        .gender-options input[type="radio"] {
+            width: auto;
+            margin: 0;
+            cursor: pointer;
+        }
+
+        .signup-btn {
+            width: 100%;
+            padding: 0.75rem;
+            border-radius: 12px;
+            border: none;
+            background: linear-gradient(135deg, #1e78c8, #0b5fb3);
+            color: white;
+            font-size: 1rem;
+            cursor: pointer;
+            margin-top: 0.5rem;
+        }
+
+        .signup-btn:hover {
+            opacity: 0.95;
+        }
+
+        .signup-footer {
+            margin-top: 1.5rem;
+            font-size: 0.85rem;
+        }
+
+        .signup-footer a {
+            color: #1e78c8;
+            text-decoration: none;
+            font-weight: 500;
+        }
+
+        .back-home {
+            margin-top: 1.2rem;
+            display: inline-block;
+            font-size: 0.85rem;
+            color: #1e78c8;
+            cursor: pointer;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="signup-container">
+
+        <img src="logo.png" alt="Check MyCure Logo" class="signup-logo" onclick="window.location.href='index.html'" style="cursor: pointer;" />
+
+        <h2>Create Account</h2>
+        <p>Join Check MyCure to unlock all features</p>
+
+        <div class="signup-group">
+            <label>Full Name</label>
+            <input type="text" id="signupName" placeholder="Your full name" />
+        </div>
+
+        <div class="signup-group">
+            <label>Email</label>
+            <input type="email" id="signupEmail" placeholder="you@example.com" />
+        </div>
+
+        <div class="signup-group">
+            <label>Gender</label>
+            <div class="gender-options">
+                <label>
+                    <input type="radio" name="gender" value="male" id="genderMale" />
+                    Male
+                </label>
+                <label>
+                    <input type="radio" name="gender" value="female" id="genderFemale" />
+                    Female
+                </label>
+                <label>
+                    <input type="radio" name="gender" value="others" id="genderOthers" />
+                    Others
+                </label>
+            </div>
+        </div>
+
+        <div class="signup-group">
+            <label>Password</label>
+            <input type="password" id="signupPassword" placeholder="Create a password" />
+        </div>
+
+        <button class="signup-btn" onclick="handleSignup()">Sign Up</button>
+
+        <div class="signup-footer">
+            Already have an account?
+            <a href="login.html">Login</a>
+        </div>
+
+        <div class="back-home" onclick="goBackHome()">← Back to Home</div>
+
+    </div>
+
+    <!-- App Logic -->
+    <script src="app.js"></script>
+
+    <script>
+        const API_BASE = '/api';
+
+        async function handleSignup() {
+            const name = document.getElementById("signupName").value.trim();
+            const email = document.getElementById("signupEmail").value.trim();
+            const password = document.getElementById("signupPassword").value;
+            const gender = document.querySelector('input[name="gender"]:checked')?.value || '';
+
+            if (!name || !email || !password) {
+                alert("Please fill all required fields");
+                return;
+            }
+
+            if (password.length < 6) {
+                alert("Password must be at least 6 characters");
+                return;
+            }
+
+            try {
+                const response = await fetch(`${API_BASE}/auth/register/`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ name, email, password, gender })
+                });
+
+                const data = await response.json();
+
+                if (!response.ok) {
+                    alert(data.error || 'Registration failed. Please try again.');
+                    return;
+                }
+
+                // Store auth token and user info
+                localStorage.setItem('authToken', data.token);
+                localStorage.setItem('isLoggedIn', 'true');
+                localStorage.setItem('userName', data.user.name || name);
+                localStorage.setItem('userEmail', data.user.email);
+                localStorage.setItem('userId', data.user.id);
+
+                alert('Account created successfully!');
+                window.location.href = 'index.html';
+            } catch (error) {
+                console.error('Signup error:', error);
+                alert('Unable to connect to the server. Please start the Django backend and try again.');
+            }
+        }
+
+        function goBackHome() {
+            window.location.href = "index.html";
+        }
+
+        // Allow Enter key to submit
+        document.addEventListener('DOMContentLoaded', () => {
+            document.getElementById('signupPassword').addEventListener('keypress', (e) => {
+                if (e.key === 'Enter') handleSignup();
+            });
+        });
+    </script>
+
+</body>
+
+</html>

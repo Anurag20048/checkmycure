@@ -1,0 +1,292 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Check MyCure</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link rel="manifest" href="manifest.json">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+
+<body>
+    <header class="site-header">
+        <div class="header-left">
+            <div class="logo-row">
+                <img src="logo.png" alt="Logo" class="logo">
+                <h1 class="logo-text">Check My Cure</h1>
+            </div>
+
+            <nav class="main-nav">
+                <ul class="nav-links">
+                    <li><a href="index.html">Home</a></li>
+                    <li><a href="about.html">About Us</a></li>
+                    <li><a href="contact.html">Contact</a></li>
+                </ul>
+            </nav>
+        </div>
+
+        <div class="header-center">
+            <div class="section-nav">
+                <button onclick="window.location.href='index.html'">Onboarding</button>
+                <button onclick="window.location.href='symptom-checker.html'">Symptoms</button>
+                <button onclick="window.location.href='chatbot.html'">Chatbot</button>
+                <button onclick="window.location.href='eye-health.html'"><i class="fas fa-eye"></i> Eye Health</button>
+                <button onclick="window.location.href='nearby-clinics.html'">Find NearBy Clinics</button>
+            </div>
+        </div>
+
+        <div class="header-right">
+            <span id="welcomeMessage" class="welcome-message"></span>
+
+            <div class="profile-menu">
+                <button class="profile-icon" id="profileBtn">
+                    <i class="fas fa-user-circle"></i>
+                </button>
+
+                <div class="profile-dropdown" id="profileDropdown">
+                    <a href="profile.html">Profile</a>
+                    <a href="dashboard.html">Dashboard</a>
+                    <a href="settings.html">Settings</a>
+                    <a href="#" id="logoutLink">Logout</a>
+                </div>
+            </div>
+        </div>
+        <div id="google_translate_element"></div>
+
+        <script type="text/javascript">
+            function googleTranslateElementInit() {
+                new google.translate.TranslateElement(
+                    {
+                        pageLanguage: 'en',
+                        layout: google.translate.TranslateElement.InlineLayout.SIMPLE
+                    },
+                    'google_translate_element'
+                );
+            }
+        </script>
+
+        <script src="//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit">
+        </script>
+
+    </header>
+    <main>
+        <div class="dashboard-container">
+            <h2 id="dashboardTitle">User Dashboard</h2>
+            <p id="dashboardSubtitle">Overview of your health activity and records.</p>
+
+            <section class="dashboard-summary">
+                <div class="dash-card">
+                    <h3>Total Visits</h3>
+                    <p id="totalVisits">0</p>
+                </div>
+                <div class="dash-card">
+                    <h3>Emergency Uses</h3>
+                    <p id="emergencyCount">0</p>
+                </div>
+                <div class="dash-card">
+                    <h3>Saved Conditions</h3>
+                    <p id="savedConditions">0</p>
+                </div>
+                <div class="dash-card">
+                    <h3>👁️ Eye Scans</h3>
+                    <p id="eyeScansCount">0</p>
+                </div>
+            </section>
+
+            <section class="dashboard-grid">
+                <div class="dash-panel">
+                    <h3>Recent Symptom Checks</h3>
+                    <ul id="recentChecks" class="dash-list">
+                        <li>No recent checks yet.</li>
+                    </ul>
+                </div>
+
+                <div class="dash-panel">
+                    <h3>🚨 Emergency Profile</h3>
+                    <ul class="dash-list">
+                        <li><strong>Name:</strong> <span id="dashName">Not set</span></li>
+                        <li><strong>Age:</strong> <span id="dashAge">Not set</span></li>
+                        <li><strong>Blood Group:</strong> <span id="dashBlood">Not set</span></li>
+                        <li><strong>Allergies:</strong> <span id="dashAllergies">Not set</span></li>
+                        <li><strong>Chronic Conditions:</strong> <span id="dashChronic">Not set</span></li>
+                        <li><strong>Medications:</strong> <span id="dashMeds">Not set</span></li>
+                        <li><strong>Last Updated:</strong> <span id="dashLastUpdate">Not available</span></li>
+                    </ul>
+
+                    <button class="btn-secondary" onclick="window.location.href='emergency-profile.html'">
+                        ✏️ Edit Emergency Profile
+                    </button>
+                </div>
+
+                <div class="dash-panel emergency-panel">
+                    <h3>Emergency Reports</h3>
+                    <div class="emergency-scroll">
+                        <ul id="emergencyReportsList" class="dash-list">
+                            <li>No emergency reports yet.</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="dash-panel">
+                    <h3>Quick Actions</h3>
+                    <button class="btn-secondary" onclick="window.location.href='symptom-checker.html'" style="margin-bottom: 0.5rem;">
+                        <i class="fas fa-stethoscope"></i> New Symptom Check
+                    </button>
+                    <button class="btn-secondary" onclick="window.location.href='eye-health.html'" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
+                        <i class="fas fa-eye"></i> Eye Health Scan
+                    </button>
+                </div>
+            </section>
+            <section class="dashboard-charts">
+
+                <div class="chart-card">
+                    <h3>📊 Usage Overview</h3>
+                    <canvas id="usageChart"></canvas>
+                </div>
+
+                <div class="chart-card">
+                    <h3>🚨 Emergency Activity</h3>
+                    <canvas id="emergencyChart"></canvas>
+                </div>
+
+                <div class="dash-panel">
+                    <h3>📈 Symptom Trend</h3>
+                    <p id="symptomTrend">Analyzing...</p>
+                </div>
+
+                <div class="chart-card">
+                    <h3>🧠 AI Severity Index</h3>
+                    <canvas id="severityChart"></canvas>
+                </div>
+
+            </section>
+        </div>
+    </main>
+
+    <!-- Floating Read Aloud -->
+    <div class="read-aloud-container">
+        <button id="readAloudToggle" class="read-aloud-btn">
+            <i class="fas fa-volume-up"></i>
+        </button>
+
+        <div id="readAloudPanel" class="read-aloud-panel">
+            <button onclick="readWholePage()">📄 Read Whole Page</button>
+            <button onclick="readSelectedText()">✂ Read Selected Text</button>
+
+            <label>
+                Speed:
+                <input type="range" id="speechSpeed" min="0.5" max="1.5" step="0.1" value="1">
+                <span id="speedValue">1x</span>
+            </label>
+
+            <button class="stop-btn" onclick="stopReading()">⏹ Stop</button>
+        </div>
+    </div>
+
+    <button class="emergency-fab" onclick="triggerEmergency()" aria-label="Emergency SOS">🚨</button>
+
+    <footer class="site-footer">
+        <div class="footer-container">
+
+            <div class="footer-brand">
+                <img src="logo.png" alt="Check MyCure logo">
+                <p>
+                    Empowering health through AI technology.
+                    Get instant disease predictions and emergency assistance anytime, anywhere.
+                </p>
+            </div>
+
+            <div class="footer-links">
+                <h4>Quick Links</h4>
+                <a href="index.html">Home</a>
+                <a href="about.html">About</a>
+                <a href="contact.html">Contact</a>
+                <a href="eye-health.html">Eye Health</a>
+            </div>
+
+            <div class="footer-social">
+                <h4>Follow Us</h4>
+                <div class="social-icons">
+                    <a href="#"><i class="fab fa-facebook-f"></i></a>
+                    <a href="#"><i class="fab fa-twitter"></i></a>
+                    <a href="#"><i class="fab fa-instagram"></i></a>
+                    <a href="#"><i class="fab fa-linkedin-in"></i></a>
+                </div>
+            </div>
+
+        </div>
+
+        <div class="footer-bottom">
+            © 2026 Check MyCure. All rights reserved.
+            <a href="#">Medical Disclaimer</a>
+        </div>
+    </footer>
+
+    <script>
+        const stats = JSON.parse(localStorage.getItem("healthStats")) || {};
+        document.getElementById("totalVisits").innerText = stats.visits || 0;
+        document.getElementById("emergencyCount").innerText = stats.emergencies || 0;
+    </script>
+
+    <script>
+        const data = JSON.parse(localStorage.getItem("analytics")) || {
+            totalChats: 0,
+            emergencies: 0,
+            normalChats: 0
+        };
+
+        // Usage Chart
+        new Chart(document.getElementById("usageChart"), {
+            type: "bar",
+            data: {
+                labels: ["Total Chats", "Normal", "Emergency"],
+                datasets: [{
+                    label: "Chatbot Usage",
+                    data: [data.totalChats, data.normalChats, data.emergencies],
+                }]
+            }
+        });
+
+        // Emergency Chart
+        new Chart(document.getElementById("emergencyChart"), {
+            type: "doughnut",
+            data: {
+                labels: ["Emergency", "Normal"],
+                datasets: [{
+                    data: [data.emergencies, data.normalChats]
+                }]
+            }
+        });
+    </script>
+
+    <script>
+        document.getElementById("symptomTrend").innerText =
+            predictSymptomTrend();
+    </script>
+
+    <script>
+        const severity = JSON.parse(localStorage.getItem("severityHistory")) || [];
+
+        new Chart(document.getElementById("severityChart"), {
+            type: "line",
+            data: {
+                labels: severity.map(s => s.date),
+                datasets: [{
+                    label: "Severity Level",
+                    data: severity.map(s => s.score),
+                    tension: 0.4
+                }]
+            }
+        });
+    </script>
+
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script src="app.js"></script>
+
+</body>
+
+</html>

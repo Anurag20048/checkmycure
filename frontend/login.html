@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Login – Check MyCure</title>
+
+    <!-- Main Styles -->
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
+    <link rel="manifest" href="manifest.json">
+
+    <style>
+        body {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(135deg, #1e78c8, #5bb1b6);
+        }
+
+        .login-container {
+            background: #ffffff;
+            padding: 3rem 2.5rem;
+            border-radius: 20px;
+            width: 100%;
+            max-width: 420px;
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.15);
+            text-align: center;
+        }
+
+        .login-logo {
+            width: 70px;
+            height: 70px;
+            margin-bottom: 1rem;
+        }
+
+        .login-container h2 {
+            margin-bottom: 0.5rem;
+            color: #0b3c68;
+        }
+
+        .login-container p {
+            font-size: 0.9rem;
+            color: rgba(0, 0, 0, 0.6);
+            margin-bottom: 2rem;
+        }
+
+        .login-group {
+            text-align: left;
+            margin-bottom: 1.2rem;
+        }
+
+        .login-group label {
+            display: block;
+            font-size: 0.85rem;
+            margin-bottom: 0.3rem;
+            color: #0b3c68;
+        }
+
+        .login-group input {
+            width: 100%;
+            padding: 0.75rem 0.8rem;
+            border-radius: 10px;
+            border: 1px solid #d0d7de;
+            outline: none;
+            font-size: 0.95rem;
+        }
+
+        .login-group input:focus {
+            border-color: #1e78c8;
+        }
+
+        .login-btn {
+            width: 100%;
+            padding: 0.75rem;
+            border-radius: 12px;
+            border: none;
+            background: linear-gradient(135deg, #1e78c8, #0b5fb3);
+            color: white;
+            font-size: 1rem;
+            cursor: pointer;
+            margin-top: 0.5rem;
+        }
+
+        .login-btn:hover {
+            opacity: 0.95;
+        }
+
+        .login-footer {
+            margin-top: 1.5rem;
+            font-size: 0.85rem;
+        }
+
+        .login-footer a {
+            color: #1e78c8;
+            text-decoration: none;
+            font-weight: 500;
+        }
+
+        .back-home {
+            margin-top: 1.2rem;
+            display: inline-block;
+            font-size: 0.85rem;
+            color: #1e78c8;
+            cursor: pointer;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="login-container">
+
+        <img src="logo.png" alt="Check MyCure Logo" class="login-logo" onclick="window.location.href='index.html'" style="cursor: pointer;" />
+
+        <h2>Welcome Back</h2>
+        <p>Sign in to continue to Check MyCure</p>
+
+        <div class="login-group">
+            <label>Email</label>
+            <input type="email" id="loginEmail" placeholder="you@example.com" />
+        </div>
+
+        <div class="login-group">
+            <label>Password</label>
+            <input type="password" id="loginPassword" placeholder="••••••••" />
+        </div>
+
+        <button class="login-btn" onclick="handleLogin()">Login</button>
+
+        <div class="login-footer">
+            Don’t have an account?
+            <a href="signup.html">Sign up</a>
+        </div>
+
+        <div class="back-home" onclick="goBackHome()">← Back to Home</div>
+
+    </div>
+
+    </div>
+
+    <!-- App Logic -->
+    <script src="app.js"></script>
+
+    <script>
+        const API_BASE = '/api';
+
+        async function handleLogin() {
+            const email = document.getElementById("loginEmail").value.trim();
+            const password = document.getElementById("loginPassword").value;
+
+            if (!email || !password) {
+                alert("Please enter both email and password");
+                return;
+            }
+
+            try {
+                const response = await fetch(`${API_BASE}/auth/login/`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ email, password })
+                });
+
+                const data = await response.json();
+
+                if (!response.ok) {
+                    alert(data.error || 'Login failed. Please check your credentials.');
+                    return;
+                }
+
+                // Store auth token and user info
+                localStorage.setItem('authToken', data.token);
+                localStorage.setItem('isLoggedIn', 'true');
+                localStorage.setItem('userName', data.user.name || data.user.email.split('@')[0]);
+                localStorage.setItem('userEmail', data.user.email);
+                localStorage.setItem('userId', data.user.id);
+
+                alert('Login successful!');
+                window.location.href = 'index.html';
+            } catch (error) {
+                console.error('Login error:', error);
+                alert('Unable to connect to the server. Please start the Django backend and try again.');
+            }
+        }
+
+        function goBackHome() {
+            window.location.href = "index.html";
+        }
+
+        // Allow Enter key to submit
+        document.addEventListener('DOMContentLoaded', () => {
+            document.getElementById('loginPassword').addEventListener('keypress', (e) => {
+                if (e.key === 'Enter') handleLogin();
+            });
+        });
+    </script>
+
+</body>
+
+</html>

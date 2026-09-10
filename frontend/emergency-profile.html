@@ -1,0 +1,406 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Emergency Profile | Check MyCure</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
+    <link rel="manifest" href="manifest.json">
+    <style>
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 2rem;
+        }
+
+        .profile-container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            padding: 2.5rem;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+        }
+
+        .profile-container h2 {
+            color: #ff4757;
+            font-size: 2rem;
+            margin-bottom: 0.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .profile-container > p {
+            color: #666;
+            margin-bottom: 2rem;
+        }
+
+        .profile-form {
+            display: grid;
+            gap: 1.5rem;
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1.5rem;
+        }
+
+        .profile-form label {
+            display: block;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 0.5rem;
+        }
+
+        .profile-form input,
+        .profile-form textarea,
+        .profile-form select {
+            width: 100%;
+            padding: 0.75rem;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            font-size: 1rem;
+            transition: border-color 0.3s;
+        }
+
+        .profile-form input:focus,
+        .profile-form textarea:focus,
+        .profile-form select:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .profile-form textarea {
+            min-height: 100px;
+            resize: vertical;
+        }
+
+        .btn-group {
+            display: flex;
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+
+        .btn-primary,
+        .btn-secondary {
+            flex: 1;
+            padding: 1rem;
+            border: none;
+            border-radius: 12px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 20px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn-secondary {
+            background: #f0f0f0;
+            color: #333;
+        }
+
+        .btn-secondary:hover {
+            background: #e0e0e0;
+        }
+
+        .section-header {
+            font-size: 1.2rem;
+            color: #667eea;
+            margin: 2rem 0 1rem 0;
+            padding-bottom: 0.5rem;
+            border-bottom: 2px solid #e0e0e0;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .info-box {
+            background: #f8f9fa;
+            border-left: 4px solid #ffc107;
+            padding: 1rem;
+            border-radius: 8px;
+            margin-bottom: 2rem;
+        }
+
+        .info-box i {
+            color: #ffc107;
+            margin-right: 0.5rem;
+        }
+
+        @media (max-width: 768px) {
+            .form-row {
+                grid-template-columns: 1fr;
+            }
+
+            .btn-group {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="profile-container">
+        <h2><i class="fas fa-ambulance"></i> Emergency Medical Profile</h2>
+        <p>This critical information will be shared with emergency responders and contacts during medical emergencies.</p>
+
+        <div class="info-box">
+            <i class="fas fa-info-circle"></i>
+            <strong>Important:</strong> Keep this information up-to-date. It could save your life in an emergency.
+        </div>
+
+        <form id="emergencyProfileForm" class="profile-form">
+            <!-- Personal Information -->
+            <h3 class="section-header"><i class="fas fa-user"></i> Personal Information</h3>
+            
+            <div class="form-row">
+                <div>
+                    <label>Full Name *</label>
+                    <input type="text" id="ep_name" placeholder="Enter your full name" required>
+                </div>
+                <div>
+                    <label>Age</label>
+                    <input type="number" id="ep_age" placeholder="Your age" min="0" max="150">
+                </div>
+            </div>
+
+            <div class="form-row">
+                <div>
+                    <label>Gender</label>
+                    <select id="ep_gender">
+                        <option value="">Select Gender</option>
+                        <option value="male">Male</option>
+                        <option value="female">Female</option>
+                        <option value="others">Others</option>
+                    </select>
+                </div>
+                <div>
+                    <label>Blood Group *</label>
+                    <select id="ep_blood" required>
+                        <option value="">Select Blood Group</option>
+                        <option value="A+">A+</option>
+                        <option value="A-">A-</option>
+                        <option value="B+">B+</option>
+                        <option value="B-">B-</option>
+                        <option value="AB+">AB+</option>
+                        <option value="AB-">AB-</option>
+                        <option value="O+">O+</option>
+                        <option value="O-">O-</option>
+                    </select>
+                </div>
+            </div>
+
+            <div>
+                <label>Height (cm)</label>
+                <input type="number" id="ep_height" placeholder="e.g., 170">
+            </div>
+
+            <div>
+                <label>Weight (kg)</label>
+                <input type="number" id="ep_weight" placeholder="e.g., 70">
+            </div>
+
+            <!-- Emergency Contacts -->
+            <h3 class="section-header"><i class="fas fa-phone"></i> Emergency Contacts</h3>
+            
+            <div class="form-row">
+                <div>
+                    <label>Primary Contact Number *</label>
+                    <input type="tel" id="ep_phone" placeholder="+91XXXXXXXXXX" required>
+                </div>
+                <div>
+                    <label>Primary Contact Name</label>
+                    <input type="text" id="ep_contact_name" placeholder="Contact person name">
+                </div>
+            </div>
+
+            <div class="form-row">
+                <div>
+                    <label>Secondary Contact Number</label>
+                    <input type="tel" id="ep_phone2" placeholder="+91XXXXXXXXXX">
+                </div>
+                <div>
+                    <label>Relation to Secondary Contact</label>
+                    <input type="text" id="ep_contact2_relation" placeholder="e.g., Friend, Spouse">
+                </div>
+            </div>
+
+            <!-- Medical Information -->
+            <h3 class="section-header"><i class="fas fa-heartbeat"></i> Medical Information</h3>
+
+            <div>
+                <label>Known Allergies</label>
+                <textarea id="ep_allergies" placeholder="List any allergies to medications, foods, or other substances..."></textarea>
+            </div>
+
+            <div>
+                <label>Chronic Conditions / Existing Diseases</label>
+                <textarea id="ep_conditions" placeholder="List any chronic illnesses (e.g., Diabetes, Hypertension, Asthma)..."></textarea>
+            </div>
+
+            <div>
+                <label>Current Medications</label>
+                <textarea id="ep_meds" placeholder="List medications you're currently taking with dosages..."></textarea>
+            </div>
+
+            <div>
+                <label>Previous Surgeries</label>
+                <textarea id="ep_surgeries" placeholder="List any previous surgeries with approximate dates..."></textarea>
+            </div>
+
+            <div>
+                <label>Insurance Information</label>
+                <input type="text" id="ep_insurance" placeholder="Insurance provider and policy number">
+            </div>
+
+            <div>
+                <label>Primary Care Physician</label>
+                <input type="text" id="ep_doctor" placeholder="Doctor's name and contact">
+            </div>
+
+            <!-- Additional Notes -->
+            <h3 class="section-header"><i class="fas fa-sticky-note"></i> Additional Information</h3>
+
+            <div>
+                <label>Special Medical Needs</label>
+                <textarea id="ep_special_needs" placeholder="Any special medical requirements or conditions emergency responders should know..."></textarea>
+            </div>
+
+            <div>
+                <label>Do Not Resuscitate (DNR) Order</label>
+                <select id="ep_dnr">
+                    <option value="no">No</option>
+                    <option value="yes">Yes</option>
+                </select>
+            </div>
+
+            <div class="btn-group">
+                <button type="submit" class="btn-primary">
+                    <i class="fas fa-save"></i> Save Emergency Profile
+                </button>
+
+                <button type="button" class="btn-secondary" onclick="window.location.href='dashboard.html'">
+                    <i class="fas fa-arrow-left"></i> Back to Dashboard
+                </button>
+            </div>
+
+        </form>
+    </div>
+
+    <script src="app.js"></script>
+
+    <script>
+        /* 🧠 Prefill existing data */
+        document.addEventListener('DOMContentLoaded', () => {
+            const profile = JSON.parse(localStorage.getItem("emergencyProfile")) || {};
+            
+            // Personal Information
+            if (profile.name) document.getElementById('ep_name').value = profile.name;
+            if (profile.age) document.getElementById('ep_age').value = profile.age;
+            if (profile.gender) document.getElementById('ep_gender').value = profile.gender;
+            if (profile.blood) document.getElementById('ep_blood').value = profile.blood;
+            if (profile.height) document.getElementById('ep_height').value = profile.height;
+            if (profile.weight) document.getElementById('ep_weight').value = profile.weight;
+            
+            // Emergency Contacts
+            if (profile.phone) document.getElementById('ep_phone').value = profile.phone;
+            if (profile.contact_name) document.getElementById('ep_contact_name').value = profile.contact_name;
+            if (profile.phone2) document.getElementById('ep_phone2').value = profile.phone2;
+            if (profile.contact2_relation) document.getElementById('ep_contact2_relation').value = profile.contact2_relation;
+            
+            // Medical Information
+            if (profile.allergies) document.getElementById('ep_allergies').value = profile.allergies;
+            if (profile.conditions) document.getElementById('ep_conditions').value = profile.conditions;
+            if (profile.meds) document.getElementById('ep_meds').value = profile.meds;
+            if (profile.surgeries) document.getElementById('ep_surgeries').value = profile.surgeries;
+            if (profile.insurance) document.getElementById('ep_insurance').value = profile.insurance;
+            if (profile.doctor) document.getElementById('ep_doctor').value = profile.doctor;
+            
+            // Additional Information
+            if (profile.special_needs) document.getElementById('ep_special_needs').value = profile.special_needs;
+            if (profile.dnr) document.getElementById('ep_dnr').value = profile.dnr;
+        });
+
+        /* 💾 Save profile */
+        document.getElementById('emergencyProfileForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const profile = {
+                // Personal Information
+                name: document.getElementById('ep_name').value,
+                age: document.getElementById('ep_age').value,
+                gender: document.getElementById('ep_gender').value,
+                blood: document.getElementById('ep_blood').value,
+                height: document.getElementById('ep_height').value,
+                weight: document.getElementById('ep_weight').value,
+                
+                // Emergency Contacts
+                phone: document.getElementById('ep_phone').value,
+                contact_name: document.getElementById('ep_contact_name').value,
+                phone2: document.getElementById('ep_phone2').value,
+                contact2_relation: document.getElementById('ep_contact2_relation').value,
+                
+                // Medical Information
+                allergies: document.getElementById('ep_allergies').value,
+                conditions: document.getElementById('ep_conditions').value,
+                meds: document.getElementById('ep_meds').value,
+                surgeries: document.getElementById('ep_surgeries').value,
+                insurance: document.getElementById('ep_insurance').value,
+                doctor: document.getElementById('ep_doctor').value,
+                
+                // Additional Information
+                special_needs: document.getElementById('ep_special_needs').value,
+                dnr: document.getElementById('ep_dnr').value,
+                
+                lastUpdated: new Date().toLocaleString()
+            };
+            
+            localStorage.setItem('emergencyProfile', JSON.stringify(profile));
+
+            const token = localStorage.getItem('authToken');
+            if (token) {
+                try {
+                    const response = await fetch('/api/medical-profile/', {
+                        method: 'PUT',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'Authorization': `Token ${token}`
+                        },
+                        body: JSON.stringify({
+                            name: profile.name, age: profile.age || null, gender: profile.gender,
+                            blood_group: profile.blood, height: profile.height || null, weight: profile.weight || null,
+                            emergency_contact_name: profile.contact_name, emergency_contact_phone: profile.phone,
+                            secondary_contact_phone: profile.phone2, secondary_contact_relation: profile.contact2_relation,
+                            allergies: profile.allergies, conditions: profile.conditions, medications: profile.meds,
+                            previous_surgeries: profile.surgeries, insurance_info: profile.insurance,
+                            primary_doctor: profile.doctor, special_needs: profile.special_needs,
+                            dnr_order: profile.dnr === 'yes'
+                        })
+                    });
+                    if (!response.ok) console.warn('Backend medical profile save failed');
+                } catch (error) {
+                    console.warn('Backend profile unavailable; local profile was saved.', error);
+                }
+            }
+
+            alert('✅ Emergency profile saved successfully!');
+            window.location.href = 'dashboard.html';
+        });
+    </script>
+
+</body>
+
+</html>

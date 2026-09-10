@@ -1,2 +1,3 @@
 # Optional conversational NLP layer for the eye-health module.
+# Pin this separately because Rasa has stricter dependency requirements than the Django app.
 rasa>=3.6,<4
