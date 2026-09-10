@@ -1,8 +1,6 @@
 name: Materialize complete source tree
 
 on:
-  push:
-    branches: [main]
   workflow_dispatch:
 
 permissions:
@@ -10,7 +8,6 @@ permissions:
 
 jobs:
   materialize:
-    if: ${{ hashFiles('frontend/index.html') == '' }}
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
@@ -31,15 +28,15 @@ jobs:
           python - <<'PY'
           from pathlib import Path
           p = Path('frontend/about.html')
-          s = p.read_text(encoding='utf-8')
-          s = s.replace("<div class=\"member-photo\" style=\"background-image: url('anurag.jpg')\"></div>",
-                        '<div class="member-photo" aria-label="Anurag Pareek">AP</div>')
-          s = s.replace("<div class=\"member-photo\" style=\"background-image: url('Charu.jpg')\"></div>",
-                        '<div class="member-photo" aria-label="Charu Jhagrawat">CJ</div>')
-          p.write_text(s, encoding='utf-8')
+          if p.exists():
+              s = p.read_text(encoding='utf-8')
+              s = s.replace("<div class=\"member-photo\" style=\"background-image: url('anurag.jpg')\"></div>",
+                            '<div class="member-photo" aria-label="Anurag Pareek">AP</div>')
+              s = s.replace("<div class=\"member-photo\" style=\"background-image: url('Charu.jpg')\"></div>",
+                            '<div class="member-photo" aria-label="Charu Jhagrawat">CJ</div>')
+              p.write_text(s, encoding='utf-8')
           PY
 
-          # The archive is only the bootstrap source; the repository should contain the source tree.
           rm -f "$ZIP"
 
       - name: Commit complete source tree
