@@ -1,0 +1,57 @@
+name: Materialize complete source tree
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  materialize:
+    if: ${{ hashFiles('frontend/index.html') == '' }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Extract complete tested project
+        shell: bash
+        run: |
+          set -e
+          ZIP="CheckMyCure_eye_rasa_fixed (1).zip"
+          test -f "$ZIP"
+          unzip -oq "$ZIP" -d .
+
+          # Do not publish personal team photographs in the portfolio source tree.
+          rm -f frontend/anurag.jpg frontend/charu.jpg frontend/Charu.jpg
+
+          # Replace photo-based team cards with privacy-safe initials.
+          python - <<'PY'
+          from pathlib import Path
+          p = Path('frontend/about.html')
+          s = p.read_text(encoding='utf-8')
+          s = s.replace("<div class=\"member-photo\" style=\"background-image: url('anurag.jpg')\"></div>",
+                        '<div class="member-photo" aria-label="Anurag Pareek">AP</div>')
+          s = s.replace("<div class=\"member-photo\" style=\"background-image: url('Charu.jpg')\"></div>",
+                        '<div class="member-photo" aria-label="Charu Jhagrawat">CJ</div>')
+          p.write_text(s, encoding='utf-8')
+          PY
+
+          # The archive is only the bootstrap source; the repository should contain the source tree.
+          rm -f "$ZIP"
+
+      - name: Commit complete source tree
+        shell: bash
+        run: |
+          set -e
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A
+          if git diff --cached --quiet; then
+            echo "No source changes to commit."
+            exit 0
+          fi
+          git commit -m "chore: materialize complete Check MyCure source tree"
+          git push
