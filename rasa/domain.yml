@@ -1,0 +1,39 @@
+version: "3.1"
+intents:
+  - greet
+  - eye_redness
+  - eye_pain
+  - blurred_vision
+  - dry_eyes
+  - itchy_eyes
+  - eye_screening_result
+  - emergency_eye
+  - prevention
+  - goodbye
+  - fallback
+responses:
+  utter_greet:
+    - text: "Hi! I can explain common eye-health symptoms and your Check MyCure screening result."
+  utter_eye_redness:
+    - text: "Eye redness can have many causes, including irritation, dryness, allergy, or infection. If it is painful, severe, or affecting vision, please seek professional eye care."
+  utter_eye_pain:
+    - text: "Eye pain deserves attention, especially when it is severe or comes with vision changes, light sensitivity, nausea, or injury. Please seek urgent professional care for those warning signs."
+  utter_blurred_vision:
+    - text: "Blurred vision can have many causes. Sudden or severe vision changes should be assessed urgently by an eye-care professional."
+  utter_dry_eyes:
+    - text: "Dry eyes can cause burning, grittiness, watering, and fluctuating vision. Screen breaks and avoiding direct air flow may help, but persistent symptoms should be checked."
+  utter_itchy_eyes:
+    - text: "Itchy eyes are commonly associated with irritation or allergy. Avoid rubbing your eyes and consider professional advice if symptoms persist or there is discharge or pain."
+  utter_eye_screening_result:
+    - text: "I can explain the latest screening result shown on this page. Remember that an image-based screening result is not a confirmed medical diagnosis."
+  utter_emergency_eye:
+    - text: "Sudden vision loss, severe eye pain, a curtain-like shadow, major eye injury, or sudden flashes/floaters can require urgent care. Please seek emergency medical attention."
+  utter_prevention:
+    - text: "For eye health, use appropriate UV protection, take regular screen breaks, avoid rubbing your eyes, protect your eyes during risky activities, and attend recommended eye examinations."
+  utter_goodbye:
+    - text: "Take care of your eyes. If symptoms worsen or you develop sudden vision changes, seek professional care."
+  utter_fallback:
+    - text: "I can help with common eye-health questions, screening results, and warning signs. Tell me what you are noticing, for example redness, pain, dryness, itching, or blurred vision."
+session_config:
+  session_expiration_time: 60
+  carry_over_slots_to_new_session: true
