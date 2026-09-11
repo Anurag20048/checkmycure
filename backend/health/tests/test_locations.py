@@ -29,6 +29,6 @@ class LocationUnitTests(SimpleTestCase):
         x=APIClient().get("/api/locations/nearby/?lat=22.30&lng=73.18"); self.assertEqual(x.status_code,200); self.assertEqual(len(x.data["results"]),2); self.assertEqual(x.data["results"][1]["phone"],"123")
 
     @patch("health.views.requests.post")
-    def test_nearby_network_failure_returns_502(self,m):
+    def test_nearby_network_failure_returns_503(self,m):
         m.side_effect=requests.RequestException("network down")
-        self.assertEqual(APIClient().get("/api/locations/nearby/?lat=22.30&lng=73.18").status_code,502)
+        self.assertEqual(APIClient().get("/api/locations/nearby/?lat=22.30&lng=73.18").status_code,503)
