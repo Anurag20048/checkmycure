@@ -273,4 +273,4 @@ def detect_symptoms_in_text(message: str) -> list[str]:
     if "vomiting" in found and "vomit" in found:
         found.remove("vomit")
 
-    return normalize_symptoms(found)
+    return canonicalize_symptoms(found)
