@@ -429,5 +429,31 @@ out center tags;"""
                 'address': ', '.join(x for x in [tags.get('addr:housenumber'), tags.get('addr:street'), tags.get('addr:city')] if x),
             })
         return Response({'results': places[:50]})
-    except requests.RequestException as exc:
-        return Response({'error': f'Nearby clinic service unavailable: {exc}'}, status=502)
+    except requests.Timeout:
+        return Response({
+            'error': 'Nearby clinic service is temporarily unavailable.',
+            'code': 'clinic_service_timeout',
+            'retryable': True,
+            'message': 'We could not reach the live map service in time. Please try again in a moment or check your internet connection.',
+        }, status=504)
+    except requests.ConnectionError:
+        return Response({
+            'error': 'Nearby clinic service is temporarily unavailable.',
+            'code': 'clinic_service_unreachable',
+            'retryable': True,
+            'message': 'We could not connect to the live map service. Please check your internet connection and try again.',
+        }, status=503)
+    except requests.HTTPError:
+        return Response({
+            'error': 'Nearby clinic service is temporarily unavailable.',
+            'code': 'clinic_service_http_error',
+            'retryable': True,
+            'message': 'The live map service did not respond normally. Please try again shortly.',
+        }, status=502)
+    except requests.RequestException:
+        return Response({
+            'error': 'Nearby clinic service is temporarily unavailable.',
+            'code': 'clinic_service_error',
+            'retryable': True,
+            'message': 'The live map service could not be reached. Please try again shortly.',
+        }, status=503)
