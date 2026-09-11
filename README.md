@@ -1,3 +1,5 @@
+[![CI](https://github.com/Anurag20048/checkmycure/actions/workflows/ci.yml/badge.svg)](https://github.com/Anurag20048/checkmycure/actions/workflows/ci.yml)
+
 # Check MyCure
 
 Check MyCure is a student-built healthcare assistant web application that combines a Django REST API with a browser-based frontend. It provides symptom checking, a rule-based health chatbot, optional eye-image analysis, eye-health conversational support, emergency profile/SOS logging, and nearby-clinic lookup.
