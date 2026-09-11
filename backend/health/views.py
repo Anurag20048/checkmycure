@@ -318,7 +318,7 @@ EYE_CHAT_FALLBACKS = {
 
 def _local_eye_chat(message):
     text = (message or '').lower().strip()
-    emergency_terms = ['sudden vision loss', 'cannot see', 'can\'t see', 'curtain over', 'severe eye pain', 'eye injury', 'sudden flashes', 'many new floaters']
+    emergency_terms = ['sudden vision loss', 'sudden loss of vision', 'cannot see', 'can\'t see', 'curtain over', 'severe eye pain', 'eye injury', 'sudden flashes', 'many new floaters']
     if any(term in text for term in emergency_terms):
         return {'intent': 'emergency_eye', 'text': 'This may be an eye emergency. Sudden vision loss, severe eye pain, major eye injury, or a curtain-like shadow over vision needs urgent medical attention.'}
     if not text:
