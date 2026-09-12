@@ -409,10 +409,24 @@ def nearby_clinics(request):
   nwr[\"amenity\"=\"doctors\"](around:{radius},{lat},{lng});
 );
 out center tags;"""
+    overpass_endpoints = [
+        'https://overpass-api.de/api/interpreter',
+        'https://overpass.kumi.systems/api/interpreter',
+        'https://overpass.private.coffee/api/interpreter',
+    ]
+    last_error = None
     try:
-        r = requests.post('https://overpass-api.de/api/interpreter', data=query,
-                          headers={'User-Agent': 'CheckMyCure/1.0 (health-app)'}, timeout=35)
-        r.raise_for_status()
+        r = None
+        for endpoint in overpass_endpoints:
+            try:
+                r = requests.post(endpoint, data=query,
+                                  headers={'User-Agent': 'CheckMyCure/1.0 (health-app)'}, timeout=20)
+                r.raise_for_status()
+                break
+            except requests.RequestException as exc:
+                last_error = exc
+        if r is None:
+            raise last_error or requests.RequestException('No Overpass endpoint available')
         places = []
         for e in r.json().get('elements', []):
             tags = e.get('tags', {})
