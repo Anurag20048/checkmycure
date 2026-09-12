@@ -1,5 +1,5 @@
 // Version 2 - Updated to fix caching issues
-const CACHE_VERSION = 'mycure-cache-v2';
+const CACHE_VERSION = 'mycure-cache-v3';
 
 self.addEventListener("push", function (event) {
   const data = event.data.json();
